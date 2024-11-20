@@ -7,8 +7,7 @@
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web",
-    "test": "jest"
+    "web": "expo start --web"
   },
   "dependencies": {
     "@expo/metro-config": "~0.19.0",
@@ -35,6 +34,7 @@
     "react-native-dotenv": "^3.4.11",
     "react-native-gesture-handler": "~2.20.2",
     "react-native-safe-area-context": "4.12.0",
+    "react-native-screens": "~4.1.0",
     "react-native-uuid": "^2.0.3",
     "react-native-web": "~0.19.13",
     "react-redux": "^9.1.2",
@@ -44,12 +44,6 @@
     "@babel/core": "^7.25.2",
     "@types/react": "~18.3.12",
     "typescript": "^5.3.3"
-  },
-  "jest": {
-    "preset": "jest-expo",
-    "transformIgnorePatterns": [
-      "node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@unimodules/.*|unimodules|sentry-expo|native-base|react-native-svg)"
-    ]
   },
   "private": true
 }
