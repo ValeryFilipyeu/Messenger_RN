@@ -1,10 +1,9 @@
 import { child, getDatabase, push, ref } from "firebase/database";
 import { getFirebaseApp } from "../firebaseHelper";
-import { UserData } from "../../types";
 
 export const createChat = async (
   loggedInUserId: string,
-  chatData: { users: UserData[] },
+  chatData: { users: string[] },
 ): Promise<string | null> => {
   const newChatData = {
     ...chatData,

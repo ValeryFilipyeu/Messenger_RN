@@ -8,9 +8,10 @@ import SettingsScreen from "../screens/SettingsScreen";
 import ChatListScreen from "../screens/ChatListScreen";
 import ChatScreen from "../screens/ChatScreen";
 import NewChatScreen from "../screens/NewChatScreen";
+import { RootStackParamList } from "../types";
 
-const Stack = createNativeStackNavigator();
-const Tab = createBottomTabNavigator();
+const Stack = createNativeStackNavigator<RootStackParamList>();
+const Tab = createBottomTabNavigator<RootStackParamList>();
 
 const TabNavigator: React.FC<unknown> = () => {
   return (
@@ -18,7 +19,7 @@ const TabNavigator: React.FC<unknown> = () => {
       screenOptions={{ headerTitle: "", headerShadowVisible: false }}
     >
       <Tab.Screen
-        name="ChatList"
+        name="ChatListScreen"
         component={ChatListScreen}
         options={{
           tabBarLabel: "Chats",
@@ -28,7 +29,7 @@ const TabNavigator: React.FC<unknown> = () => {
         }}
       />
       <Tab.Screen
-        name="Settings"
+        name="SettingsScreen"
         component={SettingsScreen}
         options={{
           tabBarLabel: "Settings",
@@ -59,7 +60,7 @@ const MainNavigator: React.FC<unknown> = () => {
           }}
         />
         <Stack.Screen
-          name="ChatSettings"
+          name="ChatSettingsScreen"
           component={ChatSettingsScreen}
           options={{
             headerTitle: "Settings",
@@ -70,7 +71,7 @@ const MainNavigator: React.FC<unknown> = () => {
 
       <Stack.Group screenOptions={{ presentation: 'containedModal' }}>
         <Stack.Screen
-          name="NewChat"
+          name="NewChatScreen"
           component={NewChatScreen}
         />
       </Stack.Group>

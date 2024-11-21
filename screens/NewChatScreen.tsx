@@ -8,8 +8,8 @@ import {
   FlatList,
 } from "react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { useDispatch, useSelector } from "react-redux";
 import { FontAwesome } from "@expo/vector-icons";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import PageContainer from "../components/PageContainer";
 import CustomHeaderButton from "../components/CustomHeaderButton";
@@ -18,18 +18,22 @@ import { RootStackParamList } from "../types";
 import { colors } from "../constants/colors";
 import commonStyles from "../constants/commonStyles";
 import { searchUsers } from "../utils/actions/userActions";
+import { setStoredUsers } from "../store/userSlice";
 import { Users } from "../types";
+import { RootState } from "../store/store";
 
 interface NewChatScreenProps {
   navigation: NativeStackNavigationProp<RootStackParamList>;
 }
 
 const NewChatScreen: React.FC<NewChatScreenProps> = ({ navigation }) => {
-  const [meId, setMeId] = useState("");
+  const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
   const [noResultsFound, setNoResultsFound] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [users, setUsers] = useState<Users | null>(null);
+
+  const userData = useSelector((state: RootState) => state.auth.userData);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -56,15 +60,12 @@ const NewChatScreen: React.FC<NewChatScreenProps> = ({ navigation }) => {
       setIsLoading(true);
 
       const usersResult = (await searchUsers(searchTerm)) ?? {};
-
-      if (meId in usersResult) {
-        delete usersResult[meId];
-      }
-
+      delete usersResult[String(userData?.userId)];
       setUsers(usersResult);
 
       if (usersResult) {
         setNoResultsFound(false);
+        dispatch(setStoredUsers({ newUsers: usersResult }));
       } else {
         setNoResultsFound(true);
       }
@@ -75,21 +76,9 @@ const NewChatScreen: React.FC<NewChatScreenProps> = ({ navigation }) => {
     return () => clearTimeout(delaySearch);
   }, [searchTerm]);
 
-  useEffect(() => {
-    const parseUserData = async () => {
-      try {
-        const data = await AsyncStorage.getItem("userData");
-        if (data !== null) {
-          const parsedData = JSON.parse(data);
-          setMeId(parsedData.userId);
-        }
-      } catch (error) {
-        console.error("Error fetching user data:", error);
-      }
-    };
-
-    parseUserData().catch(() => {});
-  }, []);
+  const userPressed = (userId: string) => {
+    navigation.navigate("ChatListScreen", { selectedUserId: userId });
+  };
 
   return (
     <PageContainer>
@@ -122,6 +111,7 @@ const NewChatScreen: React.FC<NewChatScreenProps> = ({ navigation }) => {
                 title={`${userData.firstName} ${userData.lastName}`}
                 subTitle={userData.about}
                 image={userData.profilePicture ?? ""}
+                onPress={() => userPressed(userId)}
               />
             );
           }}
