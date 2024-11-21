@@ -46,9 +46,9 @@ const ChatScreen: React.FC<ChatListScreenProps> = ({ navigation, route }) => {
     const otherUserId = chatUsers.find((uid) => uid !== userData?.userId);
     const otherUserData = storedUsers[String(otherUserId)];
 
-    return otherUserData
-      ? `${otherUserData.firstName} ${otherUserData.lastName}`
-      : "Chat Screen";
+    return (
+      otherUserData && `${otherUserData.firstName} ${otherUserData.lastName}`
+    );
   };
 
   useLayoutEffect(() => {

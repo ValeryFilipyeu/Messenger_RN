@@ -60,6 +60,14 @@ const MainNavigator: React.FC<unknown> = () => {
           }}
         />
         <Stack.Screen
+          name="ChatListScreen"
+          component={ChatListScreen}
+          options={{
+            headerTitle: "",
+            headerBackTitle: "Back",
+          }}
+        />
+        <Stack.Screen
           name="ChatSettingsScreen"
           component={ChatSettingsScreen}
           options={{
