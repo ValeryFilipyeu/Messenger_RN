@@ -11,6 +11,7 @@ import { Dispatch, UnknownAction } from "@reduxjs/toolkit";
 import { authenticate, logout } from "../../store/authSlice";
 import { getUserData } from "./userActions";
 import { getFirebaseApp, getAuth } from "../firebaseHelper";
+import { UserData } from "../../types";
 
 let timer: NodeJS.Timeout;
 
@@ -27,7 +28,7 @@ export const signUp = (
   lastName: string,
   email: string,
   password: string,
-) => {
+): ((dispatch: Dispatch) => Promise<void>) => {
   return async (dispatch: Dispatch) => {
     const app = getFirebaseApp();
     const auth = getAuth(app);
@@ -74,7 +75,10 @@ export const signUp = (
   };
 };
 
-export const signIn = (email: string, password: string) => {
+export const signIn = (
+  email: string,
+  password: string,
+): ((dispatch: Dispatch) => Promise<void>) => {
   return async (dispatch: Dispatch) => {
     const app = getFirebaseApp();
     const auth = getAuth(app);
@@ -119,7 +123,7 @@ export const signIn = (email: string, password: string) => {
   };
 };
 
-export const userLogout = () => {
+export const userLogout = (): ((dispatch: Dispatch) => Promise<void>) => {
   return async (dispatch: Dispatch) => {
     await AsyncStorage.clear();
     clearTimeout(timer);
@@ -130,7 +134,7 @@ export const userLogout = () => {
 export const updateSignedInUserData = async (
   userId: string,
   newData: Record<string, string>,
-) => {
+): Promise<void> => {
   if (newData.firstName && newData.lastName) {
     newData.firstLast =
       `${newData.firstName} ${newData.lastName}`.toLowerCase();
@@ -146,7 +150,7 @@ const createUser = async (
   lastName: string,
   email: string,
   userId: string,
-) => {
+): Promise<UserData> => {
   const firstLast = `${firstName} ${lastName}`.toLowerCase();
   const userData = {
     firstName,
@@ -167,7 +171,7 @@ const saveDataToStorage = async (
   token: string,
   userId: string,
   expiryDate: Date,
-) => {
+): Promise<void> => {
   await AsyncStorage.setItem(
     "userData",
     JSON.stringify({

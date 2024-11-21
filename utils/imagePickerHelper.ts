@@ -10,7 +10,7 @@ import {
 
 import { getFirebaseApp } from "./firebaseHelper";
 
-export const launchImagePicker = async () => {
+export const launchImagePicker = async (): Promise<string | undefined> => {
   await checkMediaPermissions();
 
   const result = await ImagePicker.launchImageLibraryAsync({
@@ -25,7 +25,7 @@ export const launchImagePicker = async () => {
   }
 };
 
-export const uploadImageAsync = async (uri: string) => {
+export const uploadImageAsync = async (uri: string): Promise<string> => {
   const app = getFirebaseApp();
 
   const blob: Blob = await new Promise((resolve, reject) => {
@@ -54,7 +54,7 @@ export const uploadImageAsync = async (uri: string) => {
   return await getDownloadURL(storageRef);
 };
 
-const checkMediaPermissions = async () => {
+const checkMediaPermissions = async (): Promise<void> => {
   if (Platform.OS !== "web") {
     const permissionResult =
       await ImagePicker.requestMediaLibraryPermissionsAsync();

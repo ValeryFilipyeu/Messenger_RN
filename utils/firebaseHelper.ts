@@ -1,4 +1,4 @@
-import { initializeApp, getApp } from "firebase/app";
+import { initializeApp, getApp, FirebaseApp } from "firebase/app";
 import {
   initializeAuth,
   getAuth,
@@ -27,7 +27,7 @@ const messagingSenderId = MESSAGING_SENDER_ID;
 const appId = APP_ID;
 const measurementId = MEASUREMENT_ID;
 
-const getFirebaseApp = () => {
+const getFirebaseApp = (): FirebaseApp => {
   // TODO: Add SDKs for Firebase products that you want to use
   // https://firebase.google.com/docs/web/setup#available-libraries
 
