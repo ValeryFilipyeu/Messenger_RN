@@ -8,13 +8,25 @@ interface DataItemProps {
   title: string;
   subTitle?: string;
   image: string;
+  onPress: () => void;
 }
 
-const DataItem: React.FC<DataItemProps> = ({ title, subTitle, image, userId }) => {
+const DataItem: React.FC<DataItemProps> = ({
+  title,
+  subTitle,
+  image,
+  userId,
+  onPress,
+}) => {
   return (
-    <TouchableWithoutFeedback>
+    <TouchableWithoutFeedback onPress={onPress}>
       <View style={styles.container}>
-        <ProfileImage userId={userId} uri={image} size={40} showEditButton={false} />
+        <ProfileImage
+          userId={userId}
+          uri={image}
+          size={40}
+          showEditButton={false}
+        />
 
         <View style={styles.textContainer}>
           <Text numberOfLines={1} style={styles.title}>

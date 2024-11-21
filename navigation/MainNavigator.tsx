@@ -68,7 +68,7 @@ const MainNavigator: React.FC<unknown> = () => {
         />
       </Stack.Group>
 
-      <Stack.Group screenOptions={{ presentation: 'card' }}>
+      <Stack.Group screenOptions={{ presentation: 'containedModal' }}>
         <Stack.Screen
           name="NewChat"
           component={NewChatScreen}
