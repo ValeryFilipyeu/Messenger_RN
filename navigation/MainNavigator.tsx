@@ -45,44 +45,28 @@ const TabNavigator: React.FC<unknown> = () => {
 const MainNavigator: React.FC<unknown> = () => {
   return (
     <Stack.Navigator>
-      <Stack.Group>
-        <Stack.Screen
-          name="Home"
-          component={TabNavigator}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="ChatScreen"
-          component={ChatScreen}
-          options={{
-            headerTitle: "",
-            headerBackTitle: "Back",
-          }}
-        />
-        <Stack.Screen
-          name="ChatListScreen"
-          component={ChatListScreen}
-          options={{
-            headerTitle: "",
-            headerBackTitle: "Back",
-          }}
-        />
-        <Stack.Screen
-          name="ChatSettingsScreen"
-          component={ChatSettingsScreen}
-          options={{
-            headerTitle: "Settings",
-            headerBackTitle: "Back",
-          }}
-        />
-      </Stack.Group>
-
-      <Stack.Group screenOptions={{ presentation: 'containedModal' }}>
-        <Stack.Screen
-          name="NewChatScreen"
-          component={NewChatScreen}
-        />
-      </Stack.Group>
+      <Stack.Screen
+        name="Home"
+        component={TabNavigator}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen name="NewChatScreen" component={NewChatScreen} />
+      <Stack.Screen
+        name="ChatScreen"
+        component={ChatScreen}
+        options={{
+          headerBackTitle: "Back",
+        }}
+      />
+      <Stack.Screen name="ChatListScreen" component={ChatListScreen} />
+      <Stack.Screen
+        name="ChatSettingsScreen"
+        component={ChatSettingsScreen}
+        options={{
+          headerTitle: "Settings",
+          headerBackTitle: "Back",
+        }}
+      />
     </Stack.Navigator>
   );
 };

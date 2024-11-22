@@ -56,7 +56,7 @@ const ChatScreen: React.FC<ChatListScreenProps> = ({ navigation, route }) => {
       headerTitle: getChatTitleFromName(),
     });
     setChatUsers(chatData?.users ?? []);
-  }, [chatData]);
+  }, [chatData, getChatTitleFromName()]);
 
   const sendMessage = useCallback(async () => {
     try {
