@@ -33,14 +33,15 @@ const ChatScreen: React.FC<ChatListScreenProps> = ({ navigation, route }) => {
   const storedUsers = useSelector(
     (state: RootState) => state.users.storedUsers,
   );
+  const storedChats = useSelector((state: RootState) => state.chats.chatsData);
 
   const [messageText, setMessageText] = useState("");
-  const [chatUsers, setChatUsers] = useState<(string | undefined)[]>([]);
+  const [chatUsers, setChatUsers] = useState<string[]>([]);
   const [chatId, setChatId] = useState<string | null | undefined>(
     route.params?.chatId,
   );
 
-  const chatData = route.params?.newChatData;
+  const chatData = (chatId && storedChats[chatId]) || route.params?.newChatData;
 
   const getChatTitleFromName = (): string => {
     const otherUserId = chatUsers.find((uid) => uid !== userData?.userId);
@@ -79,6 +80,8 @@ const ChatScreen: React.FC<ChatListScreenProps> = ({ navigation, route }) => {
     } catch (error) {
       console.error("Error sending message:", error);
     }
+
+    setMessageText("");
   }, [messageText, chatId]);
 
   return (

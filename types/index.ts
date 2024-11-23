@@ -1,13 +1,11 @@
 export type RootStackParamList = {
   Home: undefined;
   AuthScreen: undefined;
-  ChatListScreen: { selectedUserId?: string } | undefined;
-  ChatScreen:
-    | {
-        newChatData: { users: (string | undefined)[] };
-        chatId?: string | null | undefined;
-      }
-    | undefined;
+  ChatListScreen: { selectedUserId?: string };
+  ChatScreen: {
+    newChatData?: { users: string[] };
+    chatId?: string;
+  };
   ChatSettingsScreen: undefined;
   NewChatScreen: undefined;
   SettingsScreen: undefined;
@@ -39,4 +37,13 @@ export interface UserData {
 
 export interface Users {
   [userId: string]: UserData;
+}
+
+export interface ChatData {
+  key: string;
+  createdAt: string;
+  createdBy: string;
+  updatedAt: string;
+  updatedBy: string;
+  users: string[];
 }

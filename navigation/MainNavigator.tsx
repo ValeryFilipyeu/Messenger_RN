@@ -1,4 +1,5 @@
 import React from "react";
+import { View, ActivityIndicator } from "react-native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons, Feather } from "@expo/vector-icons";
@@ -9,6 +10,9 @@ import ChatListScreen from "../screens/ChatListScreen";
 import ChatScreen from "../screens/ChatScreen";
 import NewChatScreen from "../screens/NewChatScreen";
 import { RootStackParamList } from "../types";
+import { colors } from "../constants/colors";
+import commonStyles from "../constants/commonStyles";
+import useChatData from "../hooks/useChatData";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<RootStackParamList>();
@@ -42,7 +46,7 @@ const TabNavigator: React.FC<unknown> = () => {
   );
 };
 
-const MainNavigator: React.FC<unknown> = () => {
+const StackNavigator: React.FC<unknown> = () => {
   return (
     <Stack.Navigator>
       <Stack.Screen
@@ -69,6 +73,20 @@ const MainNavigator: React.FC<unknown> = () => {
       />
     </Stack.Navigator>
   );
+};
+
+const MainNavigator: React.FC<unknown> = () => {
+  const isLoading = useChatData();
+
+  if (isLoading) {
+    return (
+      <View style={commonStyles.center}>
+        <ActivityIndicator size={"large"} color={colors.pink} />
+      </View>
+    );
+  }
+
+  return <StackNavigator />;
 };
 
 export default MainNavigator;
