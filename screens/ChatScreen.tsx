@@ -65,26 +65,16 @@ const ChatScreen: React.FC<ChatListScreenProps> = ({ navigation, route }) => {
   const sendMessage = useCallback(async () => {
     try {
       let id = chatId;
-      if (!id) {
-        const newChatData = route.params?.newChatData;
-
-        if (newChatData && Array.isArray(newChatData.users)) {
-          const validUsers = newChatData.users.filter(
-            (user): user is string => user !== undefined,
-          );
-
-          id = await createChat(String(userData?.userId), {
-            users: validUsers,
-          });
-          setChatId(id);
-        }
+      if (!id && userData?.userId && route.params.newChatData) {
+        id = await createChat(userData.userId, route.params.newChatData);
+        setChatId(id);
       }
 
       if (chatId && userData?.userId) {
         await sendTextMessage(chatId, userData?.userId, messageText);
       }
     } catch (error) {
-      console.error("Error sending message:", error);
+      console.log(error);
     }
 
     setMessageText("");
