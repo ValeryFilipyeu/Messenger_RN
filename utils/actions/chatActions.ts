@@ -1,4 +1,4 @@
-import { child, getDatabase, push, ref } from "firebase/database";
+import { child, getDatabase, push, ref, update } from "firebase/database";
 import { getFirebaseApp } from "../firebaseHelper";
 
 export const createChat = async (
@@ -24,4 +24,29 @@ export const createChat = async (
   }
 
   return newChat.key;
+};
+
+export const sendTextMessage = async (
+  chatId: string,
+  senderId: string,
+  messageText: string,
+): Promise<void> => {
+  const app = getFirebaseApp();
+  const dbRef = ref(getDatabase(app));
+  const messagesRef = child(dbRef, `messages/${chatId}`);
+
+  const messageData = {
+    sentBy: senderId,
+    sentAt: new Date().toISOString(),
+    text: messageText,
+  };
+
+  await push(messagesRef, messageData);
+
+  const chatRef = child(dbRef, `chats/${chatId}`);
+  await update(chatRef, {
+    updatedBy: senderId,
+    updatedAt: new Date().toISOString(),
+    latestMessageText: messageText,
+  });
 };

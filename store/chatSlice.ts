@@ -13,8 +13,11 @@ const chatSlice = createSlice({
   name: "chats",
   initialState,
   reducers: {
-    setChatsData: (state, action: PayloadAction<{ chatsData: Record<string, ChatData> }>) => {
-      state.chatsData = action.payload.chatsData;
+    setChatsData: (
+      state,
+      action: PayloadAction<{ chatsData: Record<string, ChatData> }>,
+    ) => {
+      state.chatsData = { ...action.payload.chatsData };
     },
   },
 });

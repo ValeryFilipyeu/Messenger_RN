@@ -40,10 +40,23 @@ export interface Users {
 }
 
 export interface ChatData {
-  key: string;
+  key: string | null;
   createdAt: string;
   createdBy: string;
   updatedAt: string;
   updatedBy: string;
   users: string[];
+  latestMessageText: string;
+}
+
+export interface Message {
+  sentBy: string;
+  sentAt: string;
+  updatedBy: string;
+  updatedAt: string;
+  text: string;
+}
+
+export interface MessagesData {
+  [chatId: string]: Message;
 }

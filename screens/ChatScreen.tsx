@@ -19,7 +19,7 @@ import { RootStackParamList } from "../types";
 import { RootState } from "../store/store";
 import PageContainer from "../components/PageContainer";
 import Bubble from "../components/Bubble";
-import { createChat } from "../utils/actions/chatActions";
+import { createChat, sendTextMessage } from "../utils/actions/chatActions";
 
 const backgroundImage = require("../assets/images/chatBackground.jpg");
 
@@ -34,6 +34,9 @@ const ChatScreen: React.FC<ChatListScreenProps> = ({ navigation, route }) => {
     (state: RootState) => state.users.storedUsers,
   );
   const storedChats = useSelector((state: RootState) => state.chats.chatsData);
+  const chatMessages = useSelector(
+    (state: RootState) => state.messages.messagesData,
+  );
 
   const [messageText, setMessageText] = useState("");
   const [chatUsers, setChatUsers] = useState<string[]>([]);
@@ -73,9 +76,12 @@ const ChatScreen: React.FC<ChatListScreenProps> = ({ navigation, route }) => {
           id = await createChat(String(userData?.userId), {
             users: validUsers,
           });
-        } else {
-          console.error("Invalid chat data");
+          setChatId(id);
         }
+      }
+
+      if (chatId && userData?.userId) {
+        await sendTextMessage(chatId, userData?.userId, messageText);
       }
     } catch (error) {
       console.error("Error sending message:", error);

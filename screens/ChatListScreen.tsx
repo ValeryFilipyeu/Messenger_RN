@@ -65,8 +65,10 @@ const ChatListScreen: React.FC<ChatListScreenProps> = ({
   }, [route.params]);
 
   const handleChatPress = useCallback(
-    (chatId: string | undefined) => {
-      navigation.navigate("ChatScreen", { chatId });
+    (chatId: string | null) => {
+      if (chatId) {
+        navigation.navigate("ChatScreen", { chatId });
+      }
     },
     [navigation],
   );
@@ -92,7 +94,7 @@ const ChatListScreen: React.FC<ChatListScreenProps> = ({
           if (!otherUser) return <></>;
 
           const title = `${otherUser.firstName} ${otherUser.lastName}`;
-          const subTitle = "This will be a message..";
+          const subTitle = chatData.latestMessageText || "New chat";
           const image = otherUser.profilePicture;
 
           return (

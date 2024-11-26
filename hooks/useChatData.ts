@@ -4,8 +4,9 @@ import { getFirebaseApp } from "../utils/firebaseHelper";
 import { child, get, getDatabase, off, onValue, ref } from "firebase/database";
 import { setChatsData } from "../store/chatSlice";
 import { setStoredUsers } from "../store/userSlice";
+import { setChatMessages } from "../store/messagesSlice";
 import { RootState } from "../store/store";
-import { ChatData } from "../types";
+import { ChatData, UserData, Message } from "../types";
 
 const useChatData = (): boolean => {
   const dispatch = useDispatch();
@@ -25,7 +26,7 @@ const useChatData = (): boolean => {
     const refs = [userChatsRef];
 
     onValue(userChatsRef, (querySnapshot) => {
-      const chatIdsData = querySnapshot.val() || {};
+      const chatIdsData: Record<string, string> = querySnapshot.val() || {};
       const chatIds = Object.values(chatIdsData);
 
       const chatsData: Record<string, ChatData> = {};
@@ -39,7 +40,7 @@ const useChatData = (): boolean => {
         onValue(chatRef, (chatSnapshot) => {
           chatsFoundCount++;
 
-          const data = chatSnapshot.val();
+          const data: ChatData = chatSnapshot.val();
 
           if (data) {
             data.key = chatSnapshot.key;
@@ -50,7 +51,7 @@ const useChatData = (): boolean => {
               const userRef = child(dbRef, `users/${userId}`);
 
               get(userRef).then((userSnapshot) => {
-                const userSnapshotData = userSnapshot.val();
+                const userSnapshotData: UserData = userSnapshot.val();
                 dispatch(setStoredUsers({ newUsers: { userSnapshotData } }));
               });
 
@@ -68,6 +69,14 @@ const useChatData = (): boolean => {
             dispatch(setChatsData({ chatsData }));
             setIsLoading(false);
           }
+        });
+
+        const messagesRef = child(dbRef, `messages/${chatId}`);
+        refs.push(messagesRef);
+
+        onValue(messagesRef, (messagesSnapshot) => {
+          const messagesData: Message = messagesSnapshot.val();
+          dispatch(setChatMessages({chatId, messagesData}));
         });
 
         if (chatsFoundCount === 0) {
