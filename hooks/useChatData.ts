@@ -6,7 +6,7 @@ import { setChatsData } from "../store/chatSlice";
 import { setStoredUsers } from "../store/userSlice";
 import { setChatMessages } from "../store/messagesSlice";
 import { RootState } from "../store/store";
-import { ChatData, UserData, Message } from "../types";
+import { ChatData, UserData, MessagesData } from "../types";
 
 const useChatData = (): boolean => {
   const dispatch = useDispatch();
@@ -75,7 +75,7 @@ const useChatData = (): boolean => {
         refs.push(messagesRef);
 
         onValue(messagesRef, (messagesSnapshot) => {
-          const messagesData: Message = messagesSnapshot.val();
+          const messagesData: MessagesData = messagesSnapshot.val();
           dispatch(setChatMessages({ chatId, messagesData }));
         });
 

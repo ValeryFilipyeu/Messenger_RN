@@ -31,8 +31,7 @@ export const sendTextMessage = async (
   senderId: string,
   messageText: string,
 ): Promise<void> => {
-  const app = getFirebaseApp();
-  const dbRef = ref(getDatabase(app));
+  const dbRef = ref(getDatabase());
   const messagesRef = child(dbRef, `messages/${chatId}`);
 
   const messageData = {

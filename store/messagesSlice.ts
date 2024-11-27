@@ -1,8 +1,10 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { MessagesData, Message } from "../types";
+import { MessagesData } from "../types";
 
 export interface MessagesState {
-  messagesData: MessagesData;
+  messagesData: {
+    [chatId: string]: MessagesData;
+  };
 }
 
 const initialState: MessagesState = {
@@ -15,7 +17,7 @@ const messagesSlice = createSlice({
   reducers: {
     setChatMessages: (
       state,
-      action: PayloadAction<{ chatId: string; messagesData: Message }>,
+      action: PayloadAction<{ chatId: string; messagesData: MessagesData }>,
     ) => {
       const existingMessages = state.messagesData;
 

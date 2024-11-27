@@ -58,5 +58,5 @@ export interface Message {
 }
 
 export interface MessagesData {
-  [chatId: string]: Message;
+  [key: string]: Message;
 }
