@@ -76,7 +76,7 @@ const useChatData = (): boolean => {
 
         onValue(messagesRef, (messagesSnapshot) => {
           const messagesData: Message = messagesSnapshot.val();
-          dispatch(setChatMessages({chatId, messagesData}));
+          dispatch(setChatMessages({ chatId, messagesData }));
         });
 
         if (chatsFoundCount === 0) {

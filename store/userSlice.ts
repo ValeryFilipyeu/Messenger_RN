@@ -13,7 +13,7 @@ const userSlice = createSlice({
   name: "users",
   initialState,
   reducers: {
-    setStoredUsers: (state, action: PayloadAction<{newUsers: Users}>) => {
+    setStoredUsers: (state, action: PayloadAction<{ newUsers: Users }>) => {
       const newUsers = action.payload.newUsers;
       const existingUsers = state.storedUsers;
 

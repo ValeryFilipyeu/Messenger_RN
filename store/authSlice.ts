@@ -22,7 +22,7 @@ const authSlice = createSlice({
       action: PayloadAction<{
         token: string;
         userData: UserData;
-      }>
+      }>,
     ) => {
       const { payload } = action;
       state.token = payload.token;
@@ -42,5 +42,10 @@ const authSlice = createSlice({
     },
   },
 });
-export const { setDidTryAutoLogin, authenticate, logout, updateLoggedInUserData } = authSlice.actions;
+export const {
+  setDidTryAutoLogin,
+  authenticate,
+  logout,
+  updateLoggedInUserData,
+} = authSlice.actions;
 export default authSlice.reducer;
