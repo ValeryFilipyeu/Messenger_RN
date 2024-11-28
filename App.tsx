@@ -3,6 +3,7 @@ import { StyleSheet, LogBox } from "react-native";
 import { Provider } from "react-redux";
 // import AsyncStorage from "@react-native-async-storage/async-storage";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import { MenuProvider } from "react-native-popup-menu";
 import * as SplashScreen from "expo-splash-screen";
 import * as Font from "expo-font";
 import "react-native-gesture-handler";
@@ -58,7 +59,9 @@ export default function App() {
   return (
     <Provider store={store}>
       <SafeAreaProvider style={styles.container} onLayout={onLayout}>
-        <AppNavigator />
+        <MenuProvider>
+          <AppNavigator />
+        </MenuProvider>
       </SafeAreaProvider>
     </Provider>
   );

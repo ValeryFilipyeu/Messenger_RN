@@ -1,20 +1,75 @@
-import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import React, { useRef } from "react";
+import { StyleSheet, Text, View, TouchableWithoutFeedback } from "react-native";
+import uuid from "react-native-uuid";
+import * as Clipboard from "expo-clipboard";
+import {
+  Menu,
+  MenuTrigger,
+  MenuOptions,
+  MenuContextProps,
+  withMenuContext,
+} from "react-native-popup-menu";
+
 import { colors } from "../constants/colors";
+import MenuItem from "./MenuItem";
 
 interface BubbleProps {
   text: string;
   type: "system" | "error" | "myMessage" | "theirMessage";
 }
 
-const Bubble: React.FC<BubbleProps> = ({ text, type }) => {
+const Bubble: React.FC<BubbleProps & MenuContextProps> = ({
+  text,
+  type,
+  ctx,
+}) => {
   const style = styles({ text, type });
+
+  const id = useRef(uuid.v4());
+
+  const copyToClipboard = async (text: string) => {
+    try {
+      await Clipboard.setStringAsync(text);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const onLongPress = async () => {
+    await ctx.menuActions.openMenu(id.current);
+  };
 
   return (
     <View style={style.wrapperStyle}>
-      <View style={style.bubbleStyle}>
-        <Text style={style.textStyle}>{text}</Text>
-      </View>
+      <TouchableWithoutFeedback
+        style={{ width: "100%" }}
+        onLongPress={
+          type === "myMessage" || type === "theirMessage"
+            ? onLongPress
+            : () => {}
+        }
+      >
+        <View style={style.bubbleStyle}>
+          <Text style={style.textStyle}>{text}</Text>
+
+          <Menu name={id.current}>
+            <MenuTrigger />
+
+            <MenuOptions>
+              <MenuItem
+                text="Copy to clipboard"
+                icon="copy"
+                onSelect={() => copyToClipboard(text)}
+              />
+              <MenuItem
+                text="Star message"
+                icon="star"
+                onSelect={() => copyToClipboard(text)}
+              />
+            </MenuOptions>
+          </Menu>
+        </View>
+      </TouchableWithoutFeedback>
     </View>
   );
 };
@@ -63,4 +118,4 @@ const styles = (props: BubbleProps) => {
   });
 };
 
-export default Bubble;
+export default withMenuContext(Bubble);
