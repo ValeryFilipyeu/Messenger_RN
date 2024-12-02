@@ -1,11 +1,11 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { MenuOption } from "react-native-popup-menu";
-import { Feather } from "@expo/vector-icons";
+import { FontAwesome } from "@expo/vector-icons";
 
 interface MenuItemProps {
   text: string;
-  icon: "copy" | "star";
+  icon: "copy" | "star" | "star-o";
   onSelect: () => Promise<void>;
 }
 
@@ -14,7 +14,7 @@ const MenuItem: React.FC<MenuItemProps> = ({ text, icon, onSelect }) => {
     <MenuOption onSelect={onSelect}>
       <View style={styles.menuItemContainer}>
         <Text style={styles.menuText}>{text}</Text>
-        <Feather name={icon} size={18} />
+        <FontAwesome name={icon} size={18} />
       </View>
     </MenuOption>
   );

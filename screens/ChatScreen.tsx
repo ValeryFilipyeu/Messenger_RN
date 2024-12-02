@@ -134,6 +134,10 @@ const ChatScreen: React.FC<ChatListScreenProps> = ({ navigation, route }) => {
                       type={messageType}
                       key={itemData.index}
                       text={message.text}
+                      date={message.sentAt}
+                      messageId={message.key}
+                      userId={userData?.userId}
+                      chatId={chatId}
                     />
                   );
                 }}

@@ -1,14 +1,16 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { MessagesData } from "../types";
+import { MessagesData, StarredMessageData } from "../types";
 
 export interface MessagesState {
   messagesData: {
     [chatId: string]: MessagesData;
   };
+  starredMessages: StarredMessageData;
 }
 
 const initialState: MessagesState = {
   messagesData: {},
+  starredMessages: {},
 };
 
 const messagesSlice = createSlice({
@@ -27,7 +29,14 @@ const messagesSlice = createSlice({
 
       state.messagesData = existingMessages;
     },
+    setStarredMessages: (
+      state,
+      action: PayloadAction<{ starredMessages: StarredMessageData }>,
+    ) => {
+      const { starredMessages } = action.payload;
+      state.starredMessages = { ...starredMessages };
+    },
   },
 });
-export const { setChatMessages } = messagesSlice.actions;
+export const { setChatMessages, setStarredMessages } = messagesSlice.actions;
 export default messagesSlice.reducer;

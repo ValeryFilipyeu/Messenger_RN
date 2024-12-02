@@ -4,9 +4,9 @@ import { getFirebaseApp } from "../utils/firebaseHelper";
 import { child, get, getDatabase, off, onValue, ref } from "firebase/database";
 import { setChatsData } from "../store/chatSlice";
 import { setStoredUsers } from "../store/userSlice";
-import { setChatMessages } from "../store/messagesSlice";
+import { setChatMessages, setStarredMessages } from "../store/messagesSlice";
 import { RootState } from "../store/store";
-import { ChatData, UserData, MessagesData } from "../types";
+import { ChatData, UserData, MessagesData, StarredMessageData } from "../types";
 
 const useChatData = (): boolean => {
   const dispatch = useDispatch();
@@ -83,6 +83,16 @@ const useChatData = (): boolean => {
           setIsLoading(false);
         }
       }
+    });
+
+    const userStarredMessagesRef = child(
+      dbRef,
+      `userStarredMessages/${userData?.userId}`,
+    );
+    refs.push(userStarredMessagesRef);
+    onValue(userStarredMessagesRef, (querySnapshot) => {
+      const starredMessages: StarredMessageData = querySnapshot.val() ?? {};
+      dispatch(setStarredMessages({ starredMessages }));
     });
 
     return () => {

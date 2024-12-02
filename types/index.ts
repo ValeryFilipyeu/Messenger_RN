@@ -57,6 +57,18 @@ export interface Message {
   text: string;
 }
 
+export interface StarredMessage {
+  chatId: string;
+  messageId: string;
+  starredAt: string;
+}
+
+export interface StarredMessageData {
+  [chatId: string]: {
+    [messageId: string]: StarredMessage;
+  };
+}
+
 export interface MessagesData {
   [key: string]: Message;
 }
