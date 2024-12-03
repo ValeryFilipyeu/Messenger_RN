@@ -50,11 +50,13 @@ export interface ChatData {
 }
 
 export interface Message {
+  key: string;
   sentBy: string;
   sentAt: string;
   updatedBy: string;
   updatedAt: string;
   text: string;
+  replyTo?: string;
 }
 
 export interface StarredMessage {

@@ -5,8 +5,8 @@ import { FontAwesome } from "@expo/vector-icons";
 
 interface MenuItemProps {
   text: string;
-  icon: "copy" | "star" | "star-o";
-  onSelect: () => Promise<void>;
+  icon: "copy" | "star" | "star-o" | "arrow-left";
+  onSelect: () => Promise<void> | void;
 }
 
 const MenuItem: React.FC<MenuItemProps> = ({ text, icon, onSelect }) => {

@@ -1,4 +1,13 @@
-import { child, getDatabase, push, ref, update, get, remove, set } from "firebase/database";
+import {
+  child,
+  getDatabase,
+  push,
+  ref,
+  update,
+  get,
+  remove,
+  set,
+} from "firebase/database";
 import { getFirebaseApp } from "../firebaseHelper";
 
 export const createChat = async (
@@ -30,6 +39,7 @@ export const sendTextMessage = async (
   chatId: string,
   senderId: string,
   messageText: string,
+  replyTo?: string,
 ): Promise<void> => {
   const dbRef = ref(getDatabase());
   const messagesRef = child(dbRef, `messages/${chatId}`);
@@ -38,6 +48,7 @@ export const sendTextMessage = async (
     sentBy: senderId,
     sentAt: new Date().toISOString(),
     text: messageText,
+    replyTo,
   };
 
   await push(messagesRef, messageData);

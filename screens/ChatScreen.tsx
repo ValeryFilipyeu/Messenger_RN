@@ -17,9 +17,10 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
 
 import { colors } from "../constants/colors";
-import { RootStackParamList } from "../types";
+import { RootStackParamList, Message } from "../types";
 import { RootState } from "../store/store";
 import PageContainer from "../components/PageContainer";
+import ReplyTo from "../components/ReplyTo";
 import Bubble from "../components/Bubble";
 import { createChat, sendTextMessage } from "../utils/actions/chatActions";
 
@@ -37,6 +38,7 @@ const ChatScreen: React.FC<ChatListScreenProps> = ({ navigation, route }) => {
     route.params?.chatId,
   );
   const [errorBannerText, setErrorBannerText] = useState("");
+  const [replyingTo, setReplyingTo] = useState<Message | undefined>(undefined);
 
   const userData = useSelector((state: RootState) => state.auth.userData);
   const storedUsers = useSelector(
@@ -53,13 +55,16 @@ const ChatScreen: React.FC<ChatListScreenProps> = ({ navigation, route }) => {
 
         if (!chatMessagesData) return [];
 
-        return Object.keys(chatMessagesData).map((key) => ({
-          key,
-          ...chatMessagesData[key],
-        }));
+        return Object.keys(chatMessagesData).map((key) => {
+          const { key: _, ...message } = chatMessagesData[key];
+          return {
+            key,
+            ...message,
+          };
+        });
       },
     );
-  const chatMessages = useSelector(selectChatMessages(chatId));
+  const chatMessages: Message[] = useSelector(selectChatMessages(chatId));
 
   const chatData = (chatId && storedChats[chatId]) || route.params?.newChatData;
 
@@ -88,10 +93,16 @@ const ChatScreen: React.FC<ChatListScreenProps> = ({ navigation, route }) => {
       }
 
       if (chatId && userData?.userId) {
-        await sendTextMessage(chatId, userData?.userId, messageText);
+        await sendTextMessage(
+          chatId,
+          userData?.userId,
+          messageText,
+          replyingTo && replyingTo.key,
+        );
       }
 
       setMessageText("");
+      setReplyingTo(undefined);
     } catch (error) {
       console.log(error);
       setErrorBannerText("Message failed to send");
@@ -123,7 +134,7 @@ const ChatScreen: React.FC<ChatListScreenProps> = ({ navigation, route }) => {
               <FlatList
                 data={chatMessages}
                 renderItem={(itemData) => {
-                  const message = itemData.item;
+                  const message: Message = itemData.item;
                   const isOwnMessage = message.sentBy === userData?.userId;
                   const messageType = isOwnMessage
                     ? "myMessage"
@@ -132,18 +143,31 @@ const ChatScreen: React.FC<ChatListScreenProps> = ({ navigation, route }) => {
                   return (
                     <Bubble
                       type={messageType}
-                      key={itemData.index}
                       text={message.text}
                       date={message.sentAt}
                       messageId={message.key}
                       userId={userData?.userId}
                       chatId={chatId}
+                      setReply={() => setReplyingTo(message)}
+                      replyingTo={
+                        message.replyTo
+                          ? chatMessages.find((i) => i.key === message.replyTo)
+                          : undefined
+                      }
                     />
                   );
                 }}
               />
             )}
           </PageContainer>
+
+          {replyingTo && (
+            <ReplyTo
+              text={replyingTo.text}
+              user={storedUsers[replyingTo.sentBy]}
+              onCancel={() => setReplyingTo(undefined)}
+            />
+          )}
         </ImageBackground>
 
         <View style={styles.inputContainer}>

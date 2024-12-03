@@ -13,6 +13,7 @@ import {
 import { FontAwesome } from "@expo/vector-icons";
 
 import { colors } from "../constants/colors";
+import { Message } from "../types";
 import { RootState } from "../store/store";
 import { formatAmPm } from "../utils/formatAmPm";
 import { starMessage } from "../utils/actions/chatActions";
@@ -20,11 +21,14 @@ import MenuItem from "./MenuItem";
 
 interface BubbleProps {
   text: string;
-  type: "system" | "error" | "myMessage" | "theirMessage";
+  type: "system" | "error" | "myMessage" | "theirMessage" | "reply";
   date?: string;
   messageId?: string;
   chatId?: string;
   userId?: string;
+  name?: string;
+  setReply?: () => void;
+  replyingTo?: Message;
 }
 
 const Bubble: React.FC<BubbleProps & MenuContextProps> = ({
@@ -34,12 +38,18 @@ const Bubble: React.FC<BubbleProps & MenuContextProps> = ({
   messageId,
   chatId,
   userId,
+  name,
+  setReply,
+  replyingTo,
   ctx,
 }) => {
   const style = styles(type);
 
   const starredMessages = useSelector(
     (state: RootState) => state.messages.starredMessages[String(chatId)] ?? {},
+  );
+  const storedUsers = useSelector(
+    (state: RootState) => state.users.storedUsers,
   );
 
   const id = useRef(uuid.v4());
@@ -65,6 +75,7 @@ const Bubble: React.FC<BubbleProps & MenuContextProps> = ({
 
   const isStarred =
     isUserMessage && starredMessages[String(messageId)] !== undefined;
+  const replyingToUser = replyingTo && storedUsers[replyingTo.sentBy];
 
   return (
     <View style={style.wrapperStyle}>
@@ -77,6 +88,17 @@ const Bubble: React.FC<BubbleProps & MenuContextProps> = ({
         }
       >
         <View style={style.bubbleStyle}>
+          {name && <Text style={style.name}>{name}</Text>}
+
+          {replyingToUser && (
+            <Bubble
+              type="reply"
+              text={replyingTo.text}
+              name={`${replyingToUser.firstName} ${replyingToUser.lastName}`}
+              ctx={ctx}
+            />
+          )}
+
           <Text style={style.textStyle}>{text}</Text>
 
           {dateString && (
@@ -103,12 +125,15 @@ const Bubble: React.FC<BubbleProps & MenuContextProps> = ({
                 onSelect={() => copyToClipboard(text)}
               />
               <MenuItem
-                text={`${isStarred ? 'Unstar' : 'Star'} message`}
-                icon={isStarred ? 'star-o' : 'star'}
+                text={`${isStarred ? "Unstar" : "Star"} message`}
+                icon={isStarred ? "star-o" : "star"}
                 onSelect={() =>
                   starMessage(String(messageId), String(chatId), String(userId))
                 }
               />
+              {setReply && (
+                <MenuItem text="Reply" icon="arrow-left" onSelect={setReply} />
+              )}
             </MenuOptions>
           </Menu>
         </View>
@@ -117,7 +142,9 @@ const Bubble: React.FC<BubbleProps & MenuContextProps> = ({
   );
 };
 
-const styles = (type: "system" | "error" | "myMessage" | "theirMessage") => {
+const styles = (
+  type: "system" | "error" | "myMessage" | "theirMessage" | "reply",
+) => {
   const bubbleMaxWidth =
     type === "system" || type === "theirMessage" ? "90%" : "auto";
   const bubbleMarginTop = type === "system" || type === "error" ? 10 : 0;
@@ -129,6 +156,7 @@ const styles = (type: "system" | "error" | "myMessage" | "theirMessage") => {
     (type === "system" && colors.beige) ||
     (type === "error" && colors.red) ||
     (type === "myMessage" && "#E7FED6") ||
+    (type === "reply" && "#F2F2F2") ||
     "white";
   const textColor =
     (type === "system" && "#65644A") ||
@@ -166,6 +194,10 @@ const styles = (type: "system" | "error" | "myMessage" | "theirMessage") => {
       letterSpacing: 0.3,
       color: colors.grey,
       fontSize: 12,
+    },
+    name: {
+      fontFamily: "medium",
+      letterSpacing: 0.3,
     },
   });
 };
