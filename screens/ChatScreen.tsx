@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useLayoutEffect } from "react";
+import React, { useState, useCallback, useLayoutEffect, useRef } from "react";
 import {
   View,
   StyleSheet,
@@ -8,6 +8,8 @@ import {
   KeyboardAvoidingView,
   FlatList,
   Platform,
+  Image,
+  ActivityIndicator,
 } from "react-native";
 import { useSelector } from "react-redux";
 import { createSelector } from "@reduxjs/toolkit";
@@ -22,7 +24,16 @@ import { RootState } from "../store/store";
 import PageContainer from "../components/PageContainer";
 import ReplyTo from "../components/ReplyTo";
 import Bubble from "../components/Bubble";
-import { createChat, sendTextMessage } from "../utils/actions/chatActions";
+import {
+  createChat,
+  sendTextMessage,
+  sendImage,
+} from "../utils/actions/chatActions";
+import {
+  launchImagePicker,
+  openCamera,
+  uploadImageAsync,
+} from "../utils/imagePickerHelper";
 
 const backgroundImage = require("../assets/images/droplet.jpeg");
 
@@ -39,6 +50,9 @@ const ChatScreen: React.FC<ChatListScreenProps> = ({ navigation, route }) => {
   );
   const [errorBannerText, setErrorBannerText] = useState("");
   const [replyingTo, setReplyingTo] = useState<Message | undefined>(undefined);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const flatList = useRef<FlatList<Message> | null>(null);
 
   const userData = useSelector((state: RootState) => state.auth.userData);
   const storedUsers = useSelector(
@@ -95,7 +109,7 @@ const ChatScreen: React.FC<ChatListScreenProps> = ({ navigation, route }) => {
       if (chatId && userData?.userId) {
         await sendTextMessage(
           chatId,
-          userData?.userId,
+          userData.userId,
           messageText,
           replyingTo && replyingTo.key,
         );
@@ -109,6 +123,59 @@ const ChatScreen: React.FC<ChatListScreenProps> = ({ navigation, route }) => {
       setTimeout(() => setErrorBannerText(""), 5000);
     }
   }, [messageText, chatId]);
+
+  const pickImage = useCallback(async () => {
+    try {
+      const tempUri = await launchImagePicker();
+      if (!tempUri) return;
+
+      await uploadImage(tempUri);
+    } catch (error) {
+      console.log(error);
+    }
+  }, []);
+
+  const takePhoto = useCallback(async () => {
+    try {
+      const tempUri = await openCamera();
+      if (!tempUri) return;
+
+      await uploadImage(tempUri);
+    } catch (error) {
+      console.log(error);
+    }
+  }, []);
+
+  const uploadImage = useCallback(
+    async (tempImageUri: string) => {
+      setIsLoading(true);
+
+      try {
+        let id = chatId;
+        if (!id && userData?.userId && route.params.newChatData) {
+          id = await createChat(userData.userId, route.params.newChatData);
+          setChatId(id);
+        }
+
+        const uploadUrl = await uploadImageAsync(tempImageUri, true);
+
+        if (id && userData?.userId) {
+          await sendImage(
+            id,
+            userData.userId,
+            uploadUrl,
+            replyingTo && replyingTo.key,
+          );
+          setReplyingTo(undefined);
+        }
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [isLoading, chatId],
+  );
 
   return (
     <SafeAreaView style={styles.container} edges={["right", "left", "bottom"]}>
@@ -132,6 +199,16 @@ const ChatScreen: React.FC<ChatListScreenProps> = ({ navigation, route }) => {
 
             {chatId && (
               <FlatList
+                ref={(ref) => {
+                  flatList.current = ref;
+                }}
+                onContentSizeChange={() =>
+                  flatList.current?.scrollToEnd({ animated: false })
+                }
+                onLayout={() =>
+                  flatList.current?.scrollToEnd({ animated: false })
+                }
+                showsVerticalScrollIndicator={false}
                 data={chatMessages}
                 renderItem={(itemData) => {
                   const message: Message = itemData.item;
@@ -154,10 +231,15 @@ const ChatScreen: React.FC<ChatListScreenProps> = ({ navigation, route }) => {
                           ? chatMessages.find((i) => i.key === message.replyTo)
                           : undefined
                       }
+                      imageUrl={message.imageUrl}
                     />
                   );
                 }}
               />
+            )}
+
+            {isLoading && (
+              <ActivityIndicator size="small" color={colors.pink} />
             )}
           </PageContainer>
 
@@ -173,7 +255,8 @@ const ChatScreen: React.FC<ChatListScreenProps> = ({ navigation, route }) => {
         <View style={styles.inputContainer}>
           <TouchableOpacity
             style={styles.mediaButton}
-            onPress={() => console.log("Pressed!")}
+            onPress={pickImage}
+            disabled={isLoading}
           >
             <Feather name="plus" size={24} color={colors.pink} />
           </TouchableOpacity>
@@ -188,7 +271,8 @@ const ChatScreen: React.FC<ChatListScreenProps> = ({ navigation, route }) => {
           {messageText === "" && (
             <TouchableOpacity
               style={styles.mediaButton}
-              onPress={() => console.log("Pressed!")}
+              onPress={takePhoto}
+              disabled={isLoading}
             >
               <Feather name="camera" size={24} color={colors.pink} />
             </TouchableOpacity>
@@ -198,6 +282,7 @@ const ChatScreen: React.FC<ChatListScreenProps> = ({ navigation, route }) => {
             <TouchableOpacity
               style={{ ...styles.mediaButton, ...styles.sendButton }}
               onPress={sendMessage}
+              disabled={isLoading}
             >
               <Feather name="send" size={20} color={colors.white} />
             </TouchableOpacity>

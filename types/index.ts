@@ -57,6 +57,7 @@ export interface Message {
   updatedAt: string;
   text: string;
   replyTo?: string;
+  imageUrl?: string | null;
 }
 
 export interface StarredMessage {

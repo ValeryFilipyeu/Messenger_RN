@@ -9,6 +9,7 @@ import {
   set,
 } from "firebase/database";
 import { getFirebaseApp } from "../firebaseHelper";
+import { Message } from "../../types";
 
 export const createChat = async (
   loggedInUserId: string,
@@ -41,15 +42,41 @@ export const sendTextMessage = async (
   messageText: string,
   replyTo?: string,
 ): Promise<void> => {
+  await sendMessage(chatId, senderId, messageText, null, replyTo);
+};
+
+export const sendImage = async (
+  chatId: string,
+  senderId: string,
+  imageUrl: string,
+  replyTo?: string,
+): Promise<void> => {
+  await sendMessage(chatId, senderId, "Image", imageUrl, replyTo);
+};
+
+const sendMessage = async (
+  chatId: string,
+  senderId: string,
+  messageText: string,
+  imageUrl?: string | null,
+  replyTo?: string,
+): Promise<void> => {
   const dbRef = ref(getDatabase());
   const messagesRef = child(dbRef, `messages/${chatId}`);
 
-  const messageData = {
+  const messageData: Partial<Message> = {
     sentBy: senderId,
     sentAt: new Date().toISOString(),
     text: messageText,
-    replyTo,
   };
+
+  if (replyTo) {
+    messageData.replyTo = replyTo;
+  }
+
+  if (imageUrl) {
+    messageData.imageUrl = imageUrl;
+  }
 
   await push(messagesRef, messageData);
 

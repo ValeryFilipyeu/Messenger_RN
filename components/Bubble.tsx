@@ -1,5 +1,11 @@
 import React, { useRef } from "react";
-import { StyleSheet, Text, View, TouchableWithoutFeedback } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableWithoutFeedback,
+  Image,
+} from "react-native";
 import { useSelector } from "react-redux";
 import uuid from "react-native-uuid";
 import * as Clipboard from "expo-clipboard";
@@ -27,6 +33,7 @@ interface BubbleProps {
   chatId?: string;
   userId?: string;
   name?: string;
+  imageUrl?: string | null;
   setReply?: () => void;
   replyingTo?: Message;
 }
@@ -39,6 +46,7 @@ const Bubble: React.FC<BubbleProps & MenuContextProps> = ({
   chatId,
   userId,
   name,
+  imageUrl,
   setReply,
   replyingTo,
   ctx,
@@ -99,7 +107,9 @@ const Bubble: React.FC<BubbleProps & MenuContextProps> = ({
             />
           )}
 
-          <Text style={style.textStyle}>{text}</Text>
+          {!imageUrl && <Text style={style.textStyle}>{text}</Text>}
+
+          {imageUrl && <Image source={{ uri: imageUrl }} style={style.image} />}
 
           {dateString && (
             <View style={style.timeContainer}>
@@ -162,6 +172,7 @@ const styles = (
     (type === "system" && "#65644A") ||
     (type === "myMessage" && "#65644A") ||
     (type === "theirMessage" && colors.pink) ||
+    (type === "reply" && colors.pink) ||
     "white";
 
   return StyleSheet.create({
@@ -198,6 +209,11 @@ const styles = (
     name: {
       fontFamily: "medium",
       letterSpacing: 0.3,
+    },
+    image: {
+      width: 300,
+      height: 300,
+      marginBottom: 5,
     },
   });
 };
