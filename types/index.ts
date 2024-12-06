@@ -1,16 +1,30 @@
 export type RootStackParamList = {
   Home: undefined;
   AuthScreen: undefined;
-  ChatListScreen: { selectedUserId?: string };
-  ChatScreen: {
-    newChatData?: { users: string[] };
-    chatId?: string;
+  ChatListScreen: {
+    selectedUserId?: string;
+    chatName?: string;
+    selectedUsers?: string[];
   };
+  ChatScreen: ChatScreenNavigationProps;
   ChatSettingsScreen: undefined;
-  NewChatScreen: undefined;
+  NewChatScreen:
+    | {
+        isGroupChat: boolean;
+      }
+    | undefined;
   SettingsScreen: undefined;
   StartUpScreen: undefined;
 };
+
+export interface ChatScreenNavigationProps {
+  chatId?: string | null;
+  newChatData?: {
+    users: string[];
+    isGroupChat?: boolean;
+    chatName?: string;
+  };
+}
 
 export interface State {
   inputValidities: Record<string, boolean | [string] | undefined>;
@@ -47,6 +61,8 @@ export interface ChatData {
   updatedBy: string;
   users: string[];
   latestMessageText: string;
+  isGroupChat?: boolean;
+  chatName?: string;
 }
 
 export interface Message {

@@ -24,6 +24,9 @@ interface ProfileImageProps {
   uri: string | undefined;
   size: number;
   showEditButton: boolean;
+  showRemoveButton: boolean;
+  style?: Record<string, number | string>;
+  onPress?: () => void;
 }
 
 const ProfileImage: React.FC<ProfileImageProps> = (props) => {
@@ -63,8 +66,17 @@ const ProfileImage: React.FC<ProfileImageProps> = (props) => {
     }
   };
 
+  const showEditButtonProp = props.showEditButton && pickImage;
+  const onPressDisabled = () => {};
+  const isThereOnPress = props.onPress;
+  const onPressProfileImage =
+    showEditButtonProp || isThereOnPress || onPressDisabled;
+
   return (
-    <TouchableOpacity onPress={props.showEditButton ? pickImage : () => {}}>
+    <TouchableOpacity
+      style={props.style}
+      onPress={onPressProfileImage}
+    >
       {isLoading ? (
         <View
           style={{
@@ -89,6 +101,12 @@ const ProfileImage: React.FC<ProfileImageProps> = (props) => {
           <FontAwesome name="pencil" size={15} color="black" />
         </View>
       )}
+
+      {props.showRemoveButton && !isLoading && (
+        <View style={styles.removeIconContainer}>
+          <FontAwesome name="close" size={15} color="black" />
+        </View>
+      )}
     </TouchableOpacity>
   );
 };
@@ -110,6 +128,14 @@ const styles = StyleSheet.create({
   loadingContainer: {
     justifyContent: "center",
     alignItems: "center",
+  },
+  removeIconContainer: {
+    position: "absolute",
+    bottom: -3,
+    right: -3,
+    backgroundColor: colors.lightGrey,
+    borderRadius: 20,
+    padding: 3,
   },
 });
 

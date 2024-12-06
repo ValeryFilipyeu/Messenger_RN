@@ -91,12 +91,14 @@ const ChatScreen: React.FC<ChatListScreenProps> = ({ navigation, route }) => {
     );
   };
 
+  const title = chatData?.chatName ?? getChatTitleFromName();
+
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerTitle: getChatTitleFromName(),
+      headerTitle: title,
     });
     setChatUsers(chatData?.users ?? []);
-  }, [chatData, getChatTitleFromName()]);
+  }, [chatData, title]);
 
   const sendMessage = useCallback(async () => {
     try {
@@ -217,11 +219,15 @@ const ChatScreen: React.FC<ChatListScreenProps> = ({ navigation, route }) => {
                     ? "myMessage"
                     : "theirMessage";
 
+                  const sender = message.sentBy && storedUsers[message.sentBy];
+                  const name = sender && `${sender.firstName} ${sender.lastName}`;
+
                   return (
                     <Bubble
                       type={messageType}
                       text={message.text}
                       date={message.sentAt}
+                      name={!chatData?.isGroupChat || isOwnMessage ? undefined : name}
                       messageId={message.key}
                       userId={userData?.userId}
                       chatId={chatId}
@@ -239,7 +245,7 @@ const ChatScreen: React.FC<ChatListScreenProps> = ({ navigation, route }) => {
             )}
 
             {isLoading && (
-              <ActivityIndicator size="small" color={colors.pink} />
+              <ActivityIndicator size="large" color={colors.pink} />
             )}
           </PageContainer>
 

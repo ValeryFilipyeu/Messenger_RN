@@ -1,5 +1,7 @@
 import React from "react";
 import { StyleSheet, Text, TouchableWithoutFeedback, View } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+
 import { colors } from "../constants/colors";
 import ProfileImage from "./ProfileImage";
 
@@ -9,6 +11,8 @@ interface DataItemProps {
   subTitle?: string;
   image: string;
   onPress: () => void;
+  type: "checkbox" | "item";
+  isChecked?: boolean;
 }
 
 const DataItem: React.FC<DataItemProps> = ({
@@ -17,6 +21,8 @@ const DataItem: React.FC<DataItemProps> = ({
   image,
   userId,
   onPress,
+  type,
+  isChecked,
 }) => {
   return (
     <TouchableWithoutFeedback onPress={onPress}>
@@ -26,6 +32,7 @@ const DataItem: React.FC<DataItemProps> = ({
           uri={image}
           size={40}
           showEditButton={false}
+          showRemoveButton={false}
         />
 
         <View style={styles.textContainer}>
@@ -39,6 +46,17 @@ const DataItem: React.FC<DataItemProps> = ({
             </Text>
           )}
         </View>
+
+        {type === "checkbox" && (
+          <View
+            style={{
+              ...styles.iconContainer,
+              ...(isChecked && styles.checkedStyle),
+            }}
+          >
+            <Ionicons name="checkmark" size={18} color="white" />
+          </View>
+        )}
       </View>
     </TouchableWithoutFeedback>
   );
@@ -65,6 +83,16 @@ const styles = StyleSheet.create({
     fontFamily: "regular",
     color: colors.grey,
     letterSpacing: 0.3,
+  },
+  iconContainer: {
+    borderWidth: 1,
+    borderRadius: 50,
+    borderColor: colors.lightGrey,
+    backgroundColor: "white",
+  },
+  checkedStyle: {
+    backgroundColor: colors.pink,
+    borderColor: "transparent",
   },
 });
 

@@ -114,7 +114,8 @@ const SettingsScreen: React.FC<unknown> = () => {
 
         <ScrollView contentContainerStyle={styles.formContainer}>
           <ProfileImage
-            showEditButton={true}
+            showEditButton
+            showRemoveButton={false}
             size={80}
             userId={userData.userId}
             uri={userData.profilePicture}
