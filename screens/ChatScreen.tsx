@@ -108,9 +108,9 @@ const ChatScreen: React.FC<ChatListScreenProps> = ({ navigation, route }) => {
         setChatId(id);
       }
 
-      if (chatId && userData?.userId) {
+      if (id && userData?.userId) {
         await sendTextMessage(
-          chatId,
+          id,
           userData.userId,
           messageText,
           replyingTo && replyingTo.key,
