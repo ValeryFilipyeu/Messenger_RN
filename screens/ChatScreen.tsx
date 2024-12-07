@@ -220,14 +220,19 @@ const ChatScreen: React.FC<ChatListScreenProps> = ({ navigation, route }) => {
                     : "theirMessage";
 
                   const sender = message.sentBy && storedUsers[message.sentBy];
-                  const name = sender && `${sender.firstName} ${sender.lastName}`;
+                  const name =
+                    sender && `${sender.firstName} ${sender.lastName}`;
 
                   return (
                     <Bubble
                       type={messageType}
                       text={message.text}
                       date={message.sentAt}
-                      name={!chatData?.isGroupChat || isOwnMessage ? undefined : name}
+                      name={
+                        !chatData?.isGroupChat || isOwnMessage
+                          ? undefined
+                          : name
+                      }
                       messageId={message.key}
                       userId={userData?.userId}
                       chatId={chatId}

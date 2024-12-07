@@ -84,7 +84,7 @@ const ChatListScreen: React.FC<ChatListScreenProps> = ({
 
       navigationProps.newChatData = {
         users: chatUsers.filter((user): user is string => user !== undefined),
-        isGroupChat: true,
+        isGroupChat: chatUsers.length !== 2,
       };
 
       if (chatName) {

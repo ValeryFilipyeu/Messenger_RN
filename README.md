@@ -5,6 +5,5 @@ TO DO:
 - test coverage
 - import alias
 - create test script in package file for jest
-- fix duplication of chats from new-chat-screen
-- design of messages
+- design of messages and other element around the app
 - add image opener viewer
