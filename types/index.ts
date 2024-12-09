@@ -15,6 +15,9 @@ export type RootStackParamList = {
     | undefined;
   SettingsScreen: undefined;
   StartUpScreen: undefined;
+  ContactScreen: {
+    uid: string;
+  };
 };
 
 export interface ChatScreenNavigationProps {

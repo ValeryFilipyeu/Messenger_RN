@@ -9,6 +9,7 @@ import SettingsScreen from "../screens/SettingsScreen";
 import ChatListScreen from "../screens/ChatListScreen";
 import ChatScreen from "../screens/ChatScreen";
 import NewChatScreen from "../screens/NewChatScreen";
+import ContactScreen from "../screens/ContactScreen";
 import { RootStackParamList } from "../types";
 import { colors } from "../constants/colors";
 import commonStyles from "../constants/commonStyles";
@@ -68,6 +69,14 @@ const StackNavigator: React.FC<unknown> = () => {
         component={ChatSettingsScreen}
         options={{
           headerTitle: "Settings",
+          headerBackTitle: "Back",
+        }}
+      />
+      <Stack.Screen
+        name="ContactScreen"
+        component={ContactScreen}
+        options={{
+          headerTitle: "Contact info",
           headerBackTitle: "Back",
         }}
       />

@@ -8,7 +8,6 @@ import {
   KeyboardAvoidingView,
   FlatList,
   Platform,
-  Image,
   ActivityIndicator,
 } from "react-native";
 import { useSelector } from "react-redux";
@@ -22,6 +21,7 @@ import { colors } from "../constants/colors";
 import { RootStackParamList, Message } from "../types";
 import { RootState } from "../store/store";
 import PageContainer from "../components/PageContainer";
+import CustomHeaderButton from "../components/CustomHeaderButton";
 import ReplyTo from "../components/ReplyTo";
 import Bubble from "../components/Bubble";
 import {
@@ -96,6 +96,21 @@ const ChatScreen: React.FC<ChatListScreenProps> = ({ navigation, route }) => {
   useLayoutEffect(() => {
     navigation.setOptions({
       headerTitle: title,
+      headerRight: () => {
+        return (
+          chatId && (
+            <CustomHeaderButton
+              name="settings-outline"
+              onPress={() =>
+                !chatData?.isGroupChat &&
+                navigation.navigate("ContactScreen", {
+                  uid: chatUsers.find((uid) => uid !== userData?.userId) || "",
+                })
+              }
+            />
+          )
+        );
+      },
     });
     setChatUsers(chatData?.users ?? []);
   }, [chatData, title]);

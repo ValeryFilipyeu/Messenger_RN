@@ -11,20 +11,6 @@ import { State } from "../types";
 import { signIn } from "../utils/actions/authActions";
 import { colors } from "../constants/colors";
 
-// const isTestMode = true;
-
-// const initialState: State = {
-//   inputValues: {
-//     email: isTestMode ? "valeranuzhdin1998@mail.ru" : "",
-//     password: isTestMode ? "password" : "",
-//   },
-//   inputValidities: {
-//     email: isTestMode,
-//     password: isTestMode,
-//   },
-//   formIsValid: isTestMode
-// };
-
 const initialState: State = {
   inputValues: {
     email: "",

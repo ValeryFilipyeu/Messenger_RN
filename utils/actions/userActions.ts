@@ -29,6 +29,21 @@ export const getUserData = async (
   }
 };
 
+export const getUserChats = async (
+  userId: string,
+): Promise<Record<string, string> | undefined> => {
+  try {
+    const app = getFirebaseApp();
+    const dbRef = ref(getDatabase(app));
+    const userRef = child(dbRef, `userChats/${userId}`);
+
+    const snapshot = await get(userRef);
+    return snapshot.val();
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 export const searchUsers = async (queryText: string): Promise<Users | null> => {
   const searchTerm = queryText.toLowerCase();
 
