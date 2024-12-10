@@ -7,13 +7,14 @@ import { colors } from "../constants/colors";
 interface InputProps {
   initialValue?: string;
   label: string;
-  icon: "user" | "mail" | "lock";
+  icon?: "user" | "mail" | "lock";
   id: string;
   onInputChanged: (id: string, text: string) => void;
   autoCapitalize?: "none";
   keyboardType?: "email-address";
   iconSize?: number;
   secureTextEntry?: boolean;
+  allowEmpty?: boolean;
   errorText?: [string];
 }
 

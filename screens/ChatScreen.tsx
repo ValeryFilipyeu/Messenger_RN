@@ -102,10 +102,12 @@ const ChatScreen: React.FC<ChatListScreenProps> = ({ navigation, route }) => {
             <CustomHeaderButton
               name="settings-outline"
               onPress={() =>
-                !chatData?.isGroupChat &&
-                navigation.navigate("ContactScreen", {
-                  uid: chatUsers.find((uid) => uid !== userData?.userId) || "",
-                })
+                chatData?.isGroupChat
+                  ? navigation.navigate("ChatSettingsScreen", { chatId })
+                  : navigation.navigate("ContactScreen", {
+                      uid:
+                        chatUsers.find((uid) => uid !== userData?.userId) || "",
+                    })
               }
             />
           )

@@ -9,7 +9,7 @@ import {
   set,
 } from "firebase/database";
 import { getFirebaseApp } from "../firebaseHelper";
-import { Message } from "../../types";
+import { Message, ChatData } from "../../types";
 
 export const createChat = async (
   loggedInUserId: string,
@@ -117,4 +117,20 @@ export const starMessage = async (
   } catch (error) {
     console.log(error);
   }
+};
+
+export const updateChatData = async (
+  chatId: string,
+  userId: string,
+  chatData: Partial<ChatData>,
+): Promise<void> => {
+  const app = getFirebaseApp();
+  const dbRef = ref(getDatabase(app));
+  const chatRef = child(dbRef, `chats/${chatId}`);
+
+  await update(chatRef, {
+    ...chatData,
+    updatedAt: new Date().toISOString(),
+    updatedBy: userId,
+  });
 };

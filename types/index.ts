@@ -7,7 +7,9 @@ export type RootStackParamList = {
     selectedUsers?: string[];
   };
   ChatScreen: ChatScreenNavigationProps;
-  ChatSettingsScreen: undefined;
+  ChatSettingsScreen: {
+    chatId: string;
+  };
   NewChatScreen:
     | {
         isGroupChat: boolean;
@@ -17,6 +19,7 @@ export type RootStackParamList = {
   StartUpScreen: undefined;
   ContactScreen: {
     uid: string;
+    chatId?: string;
   };
 };
 
@@ -66,6 +69,7 @@ export interface ChatData {
   latestMessageText: string;
   isGroupChat?: boolean;
   chatName?: string;
+  chatImage?: string;
 }
 
 export interface Message {

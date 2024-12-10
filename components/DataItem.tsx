@@ -1,6 +1,6 @@
 import React from "react";
 import { StyleSheet, Text, TouchableWithoutFeedback, View } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, AntDesign } from "@expo/vector-icons";
 
 import { colors } from "../constants/colors";
 import ProfileImage from "./ProfileImage";
@@ -11,9 +11,12 @@ interface DataItemProps {
   subTitle?: string;
   image: string;
   onPress: () => void;
-  type: "checkbox" | "item" | "link";
+  type: "checkbox" | "item" | "link" | "button";
   isChecked?: boolean;
+  icon?: "plus";
 }
+
+const imageSize = 40;
 
 const DataItem: React.FC<DataItemProps> = ({
   title,
@@ -23,20 +26,35 @@ const DataItem: React.FC<DataItemProps> = ({
   onPress,
   type,
   isChecked,
+  icon,
 }) => {
   return (
     <TouchableWithoutFeedback onPress={onPress}>
       <View style={styles.container}>
-        <ProfileImage
-          userId={userId}
-          uri={image}
-          size={40}
-          showEditButton={false}
-          showRemoveButton={false}
-        />
+        {!icon && (
+          <ProfileImage
+            userId={userId}
+            uri={image}
+            size={imageSize}
+            showEditButton={false}
+            showRemoveButton={false}
+          />
+        )}
+
+        {icon && (
+          <View style={styles.leftIconContainer}>
+            <AntDesign name={icon} size={20} color={colors.blue} />
+          </View>
+        )}
 
         <View style={styles.textContainer}>
-          <Text numberOfLines={1} style={styles.title}>
+          <Text
+            numberOfLines={1}
+            style={{
+              ...styles.title,
+              ...{ color: type === "button" ? colors.blue : colors.textColor },
+            }}
+          >
             {title}
           </Text>
 
@@ -103,6 +121,14 @@ const styles = StyleSheet.create({
   checkedStyle: {
     backgroundColor: colors.pink,
     borderColor: "transparent",
+  },
+  leftIconContainer: {
+    backgroundColor: colors.extraLightGrey,
+    borderRadius: 50,
+    alignItems: "center",
+    justifyContent: "center",
+    width: imageSize,
+    height: imageSize,
   },
 });
 

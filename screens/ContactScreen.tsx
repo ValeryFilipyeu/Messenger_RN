@@ -11,6 +11,7 @@ import DataItem from "../components/DataItem";
 import PageContainer from "../components/PageContainer";
 import PageTitle from "../components/PageTitle";
 import ProfileImage from "../components/ProfileImage";
+import SubmitButton from "../components/SubmitButton";
 import { getUserChats } from "../utils/actions/userActions";
 
 interface ContactScreenProps {
@@ -26,6 +27,9 @@ const ContactScreen: React.FC<ContactScreenProps> = ({ navigation, route }) => {
   const currentUser = storedUsers[route.params.uid];
 
   const [commonChats, setCommonChats] = useState<string[]>([]);
+
+  const chatId = route.params?.chatId;
+  const chatData = chatId && storedChats[chatId];
 
   useEffect(() => {
     const getCommonUserChats = async () => {
@@ -84,6 +88,15 @@ const ContactScreen: React.FC<ContactScreenProps> = ({ navigation, route }) => {
             );
           })}
         </>
+      )}
+
+      {chatData && chatData.isGroupChat && (
+        <SubmitButton
+          title="Remove from chat"
+          color={colors.red}
+          onPress={() => {}}
+          style={{}}
+        />
       )}
     </PageContainer>
   );

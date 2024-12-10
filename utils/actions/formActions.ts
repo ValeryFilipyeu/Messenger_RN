@@ -7,7 +7,7 @@ import {
 
 export const validateInput = (
   inputId: string,
-  inputValue: string
+  inputValue: string,
 ): [string] | undefined => {
   if (inputId === "firstName" || inputId === "lastName") {
     return validateString(inputId, inputValue);
@@ -17,5 +17,7 @@ export const validateInput = (
     return validatePassword(inputId, inputValue);
   } else if (inputId === "about") {
     return validateLength(inputId, inputValue, 0, 150, true);
+  } else if (inputId === "chatName") {
+    return validateLength(inputId, inputValue, 5, 50, false);
   }
 };

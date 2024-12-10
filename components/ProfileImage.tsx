@@ -16,11 +16,13 @@ import {
 } from "../utils/imagePickerHelper";
 import { updateSignedInUserData } from "../utils/actions/authActions";
 import { updateLoggedInUserData } from "../store/authSlice";
+import { updateChatData } from "../utils/actions/chatActions";
 
 const userImage = require("../assets/images/userImage.jpeg");
 
 interface ProfileImageProps {
   userId: string;
+  chatId?: string;
   uri: string | undefined;
   size: number;
   showEditButton: boolean;
@@ -38,6 +40,7 @@ const ProfileImage: React.FC<ProfileImageProps> = (props) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const userId = props.userId;
+  const chatId = props.chatId;
 
   const pickImage = async () => {
     try {
@@ -47,17 +50,21 @@ const ProfileImage: React.FC<ProfileImageProps> = (props) => {
 
       // Upload the image
       setIsLoading(true);
-      const uploadUrl = await uploadImageAsync(tempUri);
+      const uploadUrl = await uploadImageAsync(tempUri, chatId !== undefined);
       setIsLoading(false);
 
       if (!uploadUrl) {
         throw new Error("Could not upload image");
       }
 
-      const newData = { profilePicture: uploadUrl };
+      if (chatId) {
+        await updateChatData(chatId, userId, { chatImage: uploadUrl });
+      } else {
+        const newData = { profilePicture: uploadUrl };
 
-      await updateSignedInUserData(userId, newData);
-      dispatch(updateLoggedInUserData({ newData }));
+        await updateSignedInUserData(userId, newData);
+        dispatch(updateLoggedInUserData({ newData }));
+      }
 
       setImage({ uri: uploadUrl });
     } catch (error) {
@@ -73,10 +80,7 @@ const ProfileImage: React.FC<ProfileImageProps> = (props) => {
     showEditButtonProp || isThereOnPress || onPressDisabled;
 
   return (
-    <TouchableOpacity
-      style={props.style}
-      onPress={onPressProfileImage}
-    >
+    <TouchableOpacity style={props.style} onPress={onPressProfileImage}>
       {isLoading ? (
         <View
           style={{

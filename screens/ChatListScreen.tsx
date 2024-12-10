@@ -132,6 +132,7 @@ const ChatListScreen: React.FC<ChatListScreenProps> = ({
 
           if (isGroupChat && chatData.chatName) {
             title = chatData.chatName;
+            image = chatData.chatImage;
           } else {
             otherUserId = chatData.users.find(
               (uid) => uid !== userData?.userId,
