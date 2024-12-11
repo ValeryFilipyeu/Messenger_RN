@@ -47,7 +47,7 @@ const NewChatScreen: React.FC<NewChatScreenProps> = ({ navigation, route }) => {
   const selectedUsersFlatList = useRef<FlatList<string> | null>(null);
 
   const isGroupChat = route.params?.isGroupChat;
-  const isGroupChatDisabled = selectedUsers.length === 0 || chatName === "";
+  const isGroupChatDisabled = selectedUsers.length <= 1 || chatName === "";
 
   useEffect(() => {
     navigation.setOptions({

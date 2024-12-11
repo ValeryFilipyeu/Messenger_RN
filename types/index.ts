@@ -81,6 +81,7 @@ export interface Message {
   text: string;
   replyTo?: string;
   imageUrl?: string | null;
+  type?: "system" | "error" | "myMessage" | "theirMessage" | "reply" | "info";
 }
 
 export interface StarredMessage {

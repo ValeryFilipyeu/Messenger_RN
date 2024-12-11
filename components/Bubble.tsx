@@ -27,7 +27,7 @@ import MenuItem from "./MenuItem";
 
 interface BubbleProps {
   text: string;
-  type: "system" | "error" | "myMessage" | "theirMessage" | "reply";
+  type: "system" | "error" | "myMessage" | "theirMessage" | "reply" | "info";
   date?: string;
   messageId?: string;
   chatId?: string;
@@ -96,7 +96,7 @@ const Bubble: React.FC<BubbleProps & MenuContextProps> = ({
         }
       >
         <View style={style.bubbleStyle}>
-          {name && <Text style={style.name}>{name}</Text>}
+          {name && type !== "info" && <Text style={style.name}>{name}</Text>}
 
           {replyingToUser && (
             <Bubble
@@ -111,7 +111,7 @@ const Bubble: React.FC<BubbleProps & MenuContextProps> = ({
 
           {imageUrl && <Image source={{ uri: imageUrl }} style={style.image} />}
 
-          {dateString && (
+          {dateString && type !== "info" && (
             <View style={style.timeContainer}>
               {isStarred && (
                 <FontAwesome
@@ -153,7 +153,7 @@ const Bubble: React.FC<BubbleProps & MenuContextProps> = ({
 };
 
 const styles = (
-  type: "system" | "error" | "myMessage" | "theirMessage" | "reply",
+  type: "system" | "error" | "myMessage" | "theirMessage" | "reply" | "info",
 ) => {
   const bubbleMaxWidth =
     type === "system" || type === "theirMessage" ? "90%" : "auto";
@@ -173,6 +173,7 @@ const styles = (
     (type === "myMessage" && "#65644A") ||
     (type === "theirMessage" && colors.pink) ||
     (type === "reply" && colors.pink) ||
+    (type === "info" && colors.textColor) ||
     "white";
 
   return StyleSheet.create({

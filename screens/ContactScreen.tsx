@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import React, { useState, useEffect, useCallback } from "react";
+import { StyleSheet, Text, View, ActivityIndicator } from "react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useSelector } from "react-redux";
 import { RouteProp } from "@react-navigation/native";
@@ -13,6 +13,7 @@ import PageTitle from "../components/PageTitle";
 import ProfileImage from "../components/ProfileImage";
 import SubmitButton from "../components/SubmitButton";
 import { getUserChats } from "../utils/actions/userActions";
+import { removeUserFromChat } from "../utils/actions/chatActions";
 
 interface ContactScreenProps {
   navigation: NativeStackNavigationProp<RootStackParamList>;
@@ -26,14 +27,17 @@ const ContactScreen: React.FC<ContactScreenProps> = ({ navigation, route }) => {
   const storedChats = useSelector((state: RootState) => state.chats.chatsData);
   const currentUser = storedUsers[route.params.uid];
 
+  const userData = useSelector((state: RootState) => state.auth.userData);
+
   const [commonChats, setCommonChats] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const chatId = route.params?.chatId;
   const chatData = chatId && storedChats[chatId];
 
   useEffect(() => {
     const getCommonUserChats = async () => {
-      const currentUserChats = await getUserChats(currentUser.userId);
+      const currentUserChats = await getUserChats(currentUser?.userId);
       if (currentUserChats) {
         setCommonChats(
           Object.values(currentUserChats).filter(
@@ -46,21 +50,37 @@ const ContactScreen: React.FC<ContactScreenProps> = ({ navigation, route }) => {
     getCommonUserChats().catch(() => {});
   }, []);
 
+  const removeFromChat = useCallback(async () => {
+    try {
+      setIsLoading(true);
+
+      if (userData && chatData) {
+        await removeUserFromChat(userData, currentUser, chatData);
+      }
+
+      navigation.goBack();
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [navigation, isLoading]);
+
   return (
     <PageContainer>
       <View style={styles.topContainer}>
         <ProfileImage
-          uri={currentUser.profilePicture}
+          uri={currentUser?.profilePicture}
           size={80}
           style={{ marginBottom: 20 }}
           showEditButton={false}
           showRemoveButton={false}
-          userId={currentUser.userId}
+          userId={currentUser?.userId}
         />
 
-        <PageTitle text={`${currentUser.firstName} ${currentUser.lastName}`} />
+        <PageTitle text={`${currentUser?.firstName} ${currentUser?.lastName}`} />
 
-        {currentUser.about && (
+        {currentUser?.about && (
           <Text style={styles.about} numberOfLines={2}>
             {currentUser.about}
           </Text>
@@ -77,7 +97,7 @@ const ContactScreen: React.FC<ContactScreenProps> = ({ navigation, route }) => {
             const chatData = storedChats[cid];
             return (
               <DataItem
-                userId={currentUser.userId}
+                userId={currentUser?.userId}
                 key={cid}
                 title={String(chatData.chatName)}
                 subTitle={chatData.latestMessageText}
@@ -90,14 +110,18 @@ const ContactScreen: React.FC<ContactScreenProps> = ({ navigation, route }) => {
         </>
       )}
 
-      {chatData && chatData.isGroupChat && (
-        <SubmitButton
-          title="Remove from chat"
-          color={colors.red}
-          onPress={() => {}}
-          style={{}}
-        />
-      )}
+      {chatData &&
+        chatData.isGroupChat &&
+        (isLoading ? (
+          <ActivityIndicator size="small" color={colors.pink} />
+        ) : (
+          <SubmitButton
+            title="Remove from chat"
+            color={colors.red}
+            onPress={removeFromChat}
+            style={{}}
+          />
+        ))}
     </PageContainer>
   );
 };

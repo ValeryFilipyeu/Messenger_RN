@@ -21,6 +21,7 @@ import { colors } from "../constants/colors";
 import { RootState } from "../store/store";
 import { RootStackParamList, State } from "../types";
 import { updateChatData } from "../utils/actions/chatActions";
+import { removeUserFromChat } from "../utils/actions/chatActions";
 import { validateInput } from "../utils/actions/formActions";
 import { reducer } from "../utils/reducers/formReducers";
 
@@ -46,7 +47,7 @@ const ChatSettingsScreen: React.FC<ChatSettingsScreenProps> = ({
   );
 
   const initialState: State = {
-    inputValues: { chatName: chatData.chatName ?? "" },
+    inputValues: { chatName: chatData?.chatName ?? "" },
     inputValidities: { chatName: undefined },
     formIsValid: false,
   };
@@ -84,12 +85,30 @@ const ChatSettingsScreen: React.FC<ChatSettingsScreenProps> = ({
 
   const hasChanges = () => {
     const currentValues = formState.inputValues;
-    return currentValues.chatName !== chatData.chatName;
+    return currentValues.chatName !== chatData?.chatName;
   };
+
+  const leaveChat = useCallback(async () => {
+    try {
+      setIsLoading(true);
+
+      if (userData) {
+        await removeUserFromChat(userData, userData, chatData);
+      }
+
+      navigation.popToTop();
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [navigation, isLoading]);
 
   if (!userData) {
     return <PageContainer>There is no user</PageContainer>;
   }
+
+  if (!chatData?.users) return null;
 
   return (
     <PageContainer>
@@ -102,14 +121,14 @@ const ChatSettingsScreen: React.FC<ChatSettingsScreenProps> = ({
           size={80}
           chatId={chatId}
           userId={userData.userId}
-          uri={chatData.chatImage}
+          uri={chatData?.chatImage}
         />
 
         <Input
           id="chatName"
           label="Chat name"
           autoCapitalize="none"
-          initialValue={chatData.chatName}
+          initialValue={chatData?.chatName}
           allowEmpty={false}
           onInputChanged={inputChangedHandler}
           errorText={formState.inputValidities["chatName"] as [string]}
@@ -117,7 +136,7 @@ const ChatSettingsScreen: React.FC<ChatSettingsScreenProps> = ({
 
         <View style={styles.sectionContainer}>
           <Text style={styles.heading}>
-            {chatData.users.length} Participants
+            {chatData?.users.length} Participants
           </Text>
 
           <DataItem
@@ -129,7 +148,7 @@ const ChatSettingsScreen: React.FC<ChatSettingsScreenProps> = ({
             type="button"
           />
 
-          {chatData.users.map((uid) => {
+          {chatData?.users.map((uid) => {
             const currentUser = storedUsers[uid];
             return (
               <DataItem
@@ -164,6 +183,13 @@ const ChatSettingsScreen: React.FC<ChatSettingsScreenProps> = ({
           )
         )}
       </ScrollView>
+
+      <SubmitButton
+        title="Leave chat"
+        color={colors.red}
+        onPress={leaveChat}
+        style={{ marginBottom: 20 }}
+      />
     </PageContainer>
   );
 };

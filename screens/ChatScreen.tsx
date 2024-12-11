@@ -232,9 +232,20 @@ const ChatScreen: React.FC<ChatListScreenProps> = ({ navigation, route }) => {
                 renderItem={(itemData) => {
                   const message: Message = itemData.item;
                   const isOwnMessage = message.sentBy === userData?.userId;
-                  const messageType = isOwnMessage
-                    ? "myMessage"
-                    : "theirMessage";
+                  let messageType:
+                    | "system"
+                    | "error"
+                    | "myMessage"
+                    | "theirMessage"
+                    | "reply"
+                    | "info";
+                  if (message.type && message.type === "info") {
+                    messageType = "info";
+                  } else if (isOwnMessage) {
+                    messageType = "myMessage";
+                  } else {
+                    messageType = "theirMessage";
+                  }
 
                   const sender = message.sentBy && storedUsers[message.sentBy];
                   const name =

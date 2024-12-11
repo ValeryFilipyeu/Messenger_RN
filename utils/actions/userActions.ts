@@ -9,6 +9,7 @@ import {
   orderByChild,
   startAt,
   endAt,
+  remove,
 } from "firebase/database";
 
 import { getFirebaseApp } from "../firebaseHelper";
@@ -65,6 +66,19 @@ export const searchUsers = async (queryText: string): Promise<Users | null> => {
     }
 
     return null;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
+export const deleteUserChat = async (userId: string, key: string) => {
+  try {
+    const app = getFirebaseApp();
+    const dbRef = ref(getDatabase(app));
+    const chatRef = child(dbRef, `userChats/${userId}/${key}`);
+
+    await remove(chatRef);
   } catch (error) {
     console.log(error);
     throw error;

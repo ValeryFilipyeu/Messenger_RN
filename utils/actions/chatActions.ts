@@ -9,7 +9,8 @@ import {
   set,
 } from "firebase/database";
 import { getFirebaseApp } from "../firebaseHelper";
-import { Message, ChatData } from "../../types";
+import { Message, ChatData, UserData } from "../../types";
+import { getUserChats, deleteUserChat } from "./userActions";
 
 export const createChat = async (
   loggedInUserId: string,
@@ -42,7 +43,7 @@ export const sendTextMessage = async (
   messageText: string,
   replyTo?: string,
 ): Promise<void> => {
-  await sendMessage(chatId, senderId, messageText, null, replyTo);
+  await sendMessage(chatId, senderId, messageText, null, replyTo, undefined);
 };
 
 export const sendImage = async (
@@ -51,7 +52,15 @@ export const sendImage = async (
   imageUrl: string,
   replyTo?: string,
 ): Promise<void> => {
-  await sendMessage(chatId, senderId, "Image", imageUrl, replyTo);
+  await sendMessage(chatId, senderId, "Image", imageUrl, replyTo, undefined);
+};
+
+export const sendInfoMessage = async (
+  chatId: string,
+  senderId: string,
+  messageText: string,
+) => {
+  await sendMessage(chatId, senderId, messageText, null, undefined, "info");
 };
 
 const sendMessage = async (
@@ -60,6 +69,7 @@ const sendMessage = async (
   messageText: string,
   imageUrl?: string | null,
   replyTo?: string,
+  type?: "info",
 ): Promise<void> => {
   const dbRef = ref(getDatabase());
   const messagesRef = child(dbRef, `messages/${chatId}`);
@@ -76,6 +86,10 @@ const sendMessage = async (
 
   if (imageUrl) {
     messageData.imageUrl = imageUrl;
+  }
+
+  if (type) {
+    messageData.type = type;
   }
 
   await push(messagesRef, messageData);
@@ -133,4 +147,38 @@ export const updateChatData = async (
     updatedAt: new Date().toISOString(),
     updatedBy: userId,
   });
+};
+
+export const removeUserFromChat = async (
+  userLoggedInData: UserData,
+  userToRemoveData: UserData,
+  chatData: ChatData,
+) => {
+  const userToRemoveId = userToRemoveData.userId;
+  const newUsers = chatData.users.filter((uid) => uid !== userToRemoveId);
+  await updateChatData(String(chatData.key), userLoggedInData.userId, {
+    users: newUsers,
+  });
+
+  const userChats = await getUserChats(userToRemoveId);
+
+  for (const key in userChats) {
+    const currentChatId = userChats[key];
+
+    if (currentChatId === chatData.key) {
+      await deleteUserChat(userToRemoveId, key);
+      break;
+    }
+  }
+
+  const messageText =
+    userLoggedInData.userId === userToRemoveData.userId
+      ? `${userLoggedInData.firstName} left the chat`
+      : `${userLoggedInData.firstName} removed ${userToRemoveData.firstName} from the chat`;
+
+  await sendInfoMessage(
+    String(chatData.key),
+    userLoggedInData.userId,
+    messageText,
+  );
 };

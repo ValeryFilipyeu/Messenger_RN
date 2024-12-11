@@ -43,6 +43,12 @@ const useChatData = (): boolean => {
           const data: ChatData = chatSnapshot.val();
 
           if (data) {
+            if (userData) {
+              if (!data.users.includes(userData.userId)) {
+                return;
+              }
+            }
+
             data.key = chatSnapshot.key;
 
             data.users.forEach((userId: string) => {
