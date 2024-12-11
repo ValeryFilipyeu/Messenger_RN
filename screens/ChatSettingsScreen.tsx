@@ -20,8 +20,10 @@ import SubmitButton from "../components/SubmitButton";
 import { colors } from "../constants/colors";
 import { RootState } from "../store/store";
 import { RootStackParamList, State } from "../types";
-import { updateChatData } from "../utils/actions/chatActions";
-import { removeUserFromChat } from "../utils/actions/chatActions";
+import {
+  removeUserFromChat,
+  updateChatData,
+} from "../utils/actions/chatActions";
 import { validateInput } from "../utils/actions/formActions";
 import { reducer } from "../utils/reducers/formReducers";
 
@@ -148,7 +150,7 @@ const ChatSettingsScreen: React.FC<ChatSettingsScreenProps> = ({
             type="button"
           />
 
-          {chatData?.users.map((uid) => {
+          {chatData?.users.slice(0, 4).map((uid) => {
             const currentUser = storedUsers[uid];
             return (
               <DataItem
@@ -165,6 +167,24 @@ const ChatSettingsScreen: React.FC<ChatSettingsScreenProps> = ({
               />
             );
           })}
+
+          {chatData.users.length > 4 && (
+            <DataItem
+              userId={userData.userId}
+              image=""
+              type="link"
+              title="View all"
+              hideImage
+              onPress={() =>
+                navigation.navigate("DataListScreen", {
+                  title: "Participants",
+                  data: chatData.users,
+                  type: "users",
+                  chatId,
+                })
+              }
+            />
+          )}
         </View>
 
         {showSuccessMessage && <Text>Saved!</Text>}

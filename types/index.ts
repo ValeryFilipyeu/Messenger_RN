@@ -21,6 +21,12 @@ export type RootStackParamList = {
     uid: string;
     chatId?: string;
   };
+  DataListScreen: {
+    title: string;
+    data: string[];
+    type: "users";
+    chatId: string;
+  };
 };
 
 export interface ChatScreenNavigationProps {

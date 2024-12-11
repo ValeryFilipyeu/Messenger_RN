@@ -10,6 +10,7 @@ import ChatListScreen from "../screens/ChatListScreen";
 import ChatScreen from "../screens/ChatScreen";
 import NewChatScreen from "../screens/NewChatScreen";
 import ContactScreen from "../screens/ContactScreen";
+import DataListScreen from "../screens/DataListScreen";
 import { RootStackParamList } from "../types";
 import { colors } from "../constants/colors";
 import commonStyles from "../constants/commonStyles";
@@ -77,6 +78,14 @@ const StackNavigator: React.FC<unknown> = () => {
         component={ContactScreen}
         options={{
           headerTitle: "Contact info",
+          headerBackTitle: "Back",
+        }}
+      />
+      <Stack.Screen
+        name="DataListScreen"
+        component={DataListScreen}
+        options={{
+          headerTitle: "",
           headerBackTitle: "Back",
         }}
       />

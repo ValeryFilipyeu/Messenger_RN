@@ -14,6 +14,7 @@ interface DataItemProps {
   type: "checkbox" | "item" | "link" | "button";
   isChecked?: boolean;
   icon?: "plus";
+  hideImage?: boolean;
 }
 
 const imageSize = 40;
@@ -27,11 +28,12 @@ const DataItem: React.FC<DataItemProps> = ({
   type,
   isChecked,
   icon,
+  hideImage,
 }) => {
   return (
     <TouchableWithoutFeedback onPress={onPress}>
       <View style={styles.container}>
-        {!icon && (
+        {!icon && !hideImage && (
           <ProfileImage
             userId={userId}
             uri={image}
