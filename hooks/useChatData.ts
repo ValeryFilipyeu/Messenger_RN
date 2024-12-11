@@ -32,6 +32,10 @@ const useChatData = (): boolean => {
       const chatsData: Record<string, ChatData> = {};
       let chatsFoundCount = 0;
 
+      if (chatIds.length === 0) {
+        setIsLoading(false);
+      }
+
       for (let i = 0; i < chatIds.length; i++) {
         const chatId = chatIds[i];
         const chatRef = child(dbRef, `chats/${chatId}`);
