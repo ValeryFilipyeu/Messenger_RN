@@ -47,7 +47,12 @@ const NewChatScreen: React.FC<NewChatScreenProps> = ({ navigation, route }) => {
   const selectedUsersFlatList = useRef<FlatList<string> | null>(null);
 
   const isGroupChat = route.params?.isGroupChat;
-  const isGroupChatDisabled = selectedUsers.length <= 1 || chatName === "";
+  const chatId = route.params?.chatId;
+  const existingUsers = route.params?.existingUsers;
+  const isNewChat = !chatId;
+
+  const isGroupChatDisabled =
+    selectedUsers.length === 0 || (isNewChat && chatName === "");
 
   useEffect(() => {
     navigation.setOptions({
@@ -63,13 +68,21 @@ const NewChatScreen: React.FC<NewChatScreenProps> = ({ navigation, route }) => {
         return (
           isGroupChat && (
             <CustomHeaderButton
-              name="create-outline"
+              color={isGroupChatDisabled ? colors.lightGrey : undefined}
+              name={isNewChat ? "create-outline" : "add-outline"}
               isDisabled={isGroupChatDisabled}
               onPress={() => {
-                navigation.navigate("ChatListScreen", {
-                  selectedUsers,
-                  chatName,
-                });
+                if (isNewChat) {
+                  navigation.navigate("ChatListScreen", {
+                    selectedUsers,
+                    chatName,
+                  });
+                } else {
+                  navigation.navigate("ChatSettingsScreen", {
+                    chatId,
+                    selectedUsers,
+                  });
+                }
               }}
             />
           )
@@ -120,50 +133,50 @@ const NewChatScreen: React.FC<NewChatScreenProps> = ({ navigation, route }) => {
 
   return (
     <PageContainer>
-      {isGroupChat && (
-        <>
-          <View style={styles.chatNameContainer}>
-            <View style={styles.inputContainer}>
-              <TextInput
-                style={styles.textbox}
-                placeholder="Enter a name for your chat"
-                autoCorrect={false}
-                autoComplete="off"
-                onChangeText={(text) => setChatName(text)}
-              />
-            </View>
-          </View>
-
-          <View style={styles.selectedUsersContainer}>
-            <FlatList
-              data={selectedUsers}
-              style={styles.selectedUsersList}
-              horizontal={true}
-              keyExtractor={(item) => item}
-              contentContainerStyle={{ alignItems: "center" }}
-              ref={(ref) => (selectedUsersFlatList.current = ref)}
-              onContentSizeChange={() =>
-                selectedUsersFlatList.current?.scrollToEnd()
-              }
-              renderItem={(itemData) => {
-                const userId = itemData.item;
-                const userData = storedUsers[userId];
-
-                return (
-                  <ProfileImage
-                    userId={userData.userId}
-                    style={styles.selectedUserStyle}
-                    size={40}
-                    uri={userData.profilePicture}
-                    onPress={() => userPressed(userId)}
-                    showRemoveButton
-                    showEditButton={false}
-                  />
-                );
-              }}
+      {isNewChat && isGroupChat && (
+        <View style={styles.chatNameContainer}>
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.textbox}
+              placeholder="Enter a name for your chat"
+              autoCorrect={false}
+              autoComplete="off"
+              onChangeText={(text) => setChatName(text)}
             />
           </View>
-        </>
+        </View>
+      )}
+
+      {isGroupChat && (
+        <View style={styles.selectedUsersContainer}>
+          <FlatList
+            data={selectedUsers}
+            style={styles.selectedUsersList}
+            horizontal={true}
+            keyExtractor={(item) => item}
+            contentContainerStyle={{ alignItems: "center" }}
+            ref={(ref) => (selectedUsersFlatList.current = ref)}
+            onContentSizeChange={() =>
+              selectedUsersFlatList.current?.scrollToEnd()
+            }
+            renderItem={(itemData) => {
+              const userId = itemData.item;
+              const userData = storedUsers[userId];
+
+              return (
+                <ProfileImage
+                  userId={userData.userId}
+                  style={styles.selectedUserStyle}
+                  size={40}
+                  uri={userData.profilePicture}
+                  onPress={() => userPressed(userId)}
+                  showRemoveButton
+                  showEditButton={false}
+                />
+              );
+            }}
+          />
+        </View>
       )}
 
       <View style={styles.searchContainer}>
@@ -188,6 +201,10 @@ const NewChatScreen: React.FC<NewChatScreenProps> = ({ navigation, route }) => {
           renderItem={(itemData) => {
             const userId = itemData.item;
             const userData = users[userId];
+
+            if (existingUsers && existingUsers.includes(userId)) {
+              return null;
+            }
 
             return (
               <DataItem

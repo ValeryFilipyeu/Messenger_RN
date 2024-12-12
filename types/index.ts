@@ -9,10 +9,13 @@ export type RootStackParamList = {
   ChatScreen: ChatScreenNavigationProps;
   ChatSettingsScreen: {
     chatId: string;
+    selectedUsers?: string[];
   };
   NewChatScreen:
     | {
         isGroupChat: boolean;
+        chatId?: string;
+        existingUsers?: string[];
       }
     | undefined;
   SettingsScreen: undefined;
