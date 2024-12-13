@@ -1,4 +1,4 @@
-import React, { useCallback, useReducer, useState } from "react";
+import React, { useCallback, useReducer, useState, useMemo } from "react";
 import {
   View,
   Text,
@@ -10,8 +10,10 @@ import {
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { UnknownAction } from "@reduxjs/toolkit";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 import Input from "../components/Input";
+import DataItem from "../components/DataItem";
 import PageContainer from "../components/PageContainer";
 import PageTitle from "../components/PageTitle";
 import ProfileImage from "../components/ProfileImage";
@@ -19,7 +21,7 @@ import SubmitButton from "../components/SubmitButton";
 
 import { colors } from "../constants/colors";
 import { RootState } from "../store/store";
-import { State } from "../types";
+import { State, StarredMessage, RootStackParamList } from "../types";
 import { updateLoggedInUserData } from "../store/authSlice";
 import {
   updateSignedInUserData,
@@ -28,12 +30,32 @@ import {
 import { validateInput } from "../utils/actions/formActions";
 import { reducer } from "../utils/reducers/formReducers";
 
-const SettingsScreen: React.FC<unknown> = () => {
+interface SettingsScreenProps {
+  navigation: NativeStackNavigationProp<RootStackParamList>;
+}
+
+const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
   const dispatch = useDispatch();
 
   const [isLoading, setIsLoading] = useState(false);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const userData = useSelector((state: RootState) => state.auth.userData);
+  const starredMessages = useSelector(
+    (state: RootState) => state.messages.starredMessages ?? {},
+  );
+
+  const sortedStarredMessages = useMemo(() => {
+    let result: StarredMessage[] = [];
+
+    const chats = Object.values(starredMessages);
+
+    chats.forEach((chat) => {
+      const chatMessages = Object.values(chat);
+      result = result.concat(chatMessages);
+    });
+
+    return result;
+  }, [starredMessages]);
 
   const firstName = userData?.firstName || "";
   const lastName = userData?.lastName || "";
@@ -63,7 +85,7 @@ const SettingsScreen: React.FC<unknown> = () => {
       const result = validateInput(inputId, inputValue);
       dispatchFormState({ inputId, validationResult: result, inputValue });
     },
-    [dispatchFormState]
+    [dispatchFormState],
   );
 
   const saveHandler = useCallback(async () => {
@@ -182,6 +204,21 @@ const SettingsScreen: React.FC<unknown> = () => {
               )
             )}
           </View>
+
+          <DataItem
+            type="link"
+            title="Starred messages"
+            hideImage
+            image=""
+            userId={userData.userId}
+            onPress={() =>
+              navigation.navigate("DataListScreen", {
+                title: "Starred messages",
+                data: sortedStarredMessages,
+                type: "messages",
+              })
+            }
+          />
 
           <SubmitButton
             title="Logout"

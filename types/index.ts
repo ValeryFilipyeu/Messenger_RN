@@ -26,9 +26,9 @@ export type RootStackParamList = {
   };
   DataListScreen: {
     title: string;
-    data: string[];
-    type: "users";
-    chatId: string;
+    data: string[] | StarredMessage[];
+    type: "users" | "messages";
+    chatId?: string;
   };
 };
 

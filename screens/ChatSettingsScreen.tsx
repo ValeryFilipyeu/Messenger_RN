@@ -48,6 +48,9 @@ const ChatSettingsScreen: React.FC<ChatSettingsScreenProps> = ({
   const storedUsers = useSelector(
     (state: RootState) => state.users.storedUsers,
   );
+  const starredMessages = useSelector(
+    (state: RootState) => state.messages.starredMessages[chatId] ?? {},
+  );
 
   const initialState: State = {
     inputValues: { chatName: chatData?.chatName ?? "" },
@@ -233,6 +236,21 @@ const ChatSettingsScreen: React.FC<ChatSettingsScreenProps> = ({
             />
           )
         )}
+
+        <DataItem
+          type="link"
+          title="Starred messages"
+          hideImage
+          image=""
+          userId={userData.userId}
+          onPress={() =>
+            navigation.navigate("DataListScreen", {
+              title: "Starred messages",
+              data: Object.values(starredMessages),
+              type: "messages",
+            })
+          }
+        />
       </ScrollView>
 
       <SubmitButton
