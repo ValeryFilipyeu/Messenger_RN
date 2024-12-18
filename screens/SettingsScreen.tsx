@@ -222,7 +222,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
 
           <SubmitButton
             title="Logout"
-            onPress={() => dispatch(userLogout() as unknown as UnknownAction)}
+            onPress={() => dispatch(userLogout(userData) as unknown as UnknownAction)}
             style={{ marginTop: 20 }}
             color={colors.red}
           />

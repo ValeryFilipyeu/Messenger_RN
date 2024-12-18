@@ -15,6 +15,7 @@ import { RootStackParamList } from "../types";
 import { colors } from "../constants/colors";
 import commonStyles from "../constants/commonStyles";
 import useChatData from "../hooks/useChatData";
+import useNotifications from "../hooks/useNotifications";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<RootStackParamList>();
@@ -95,6 +96,7 @@ const StackNavigator: React.FC<unknown> = () => {
 
 const MainNavigator: React.FC<unknown> = () => {
   const isLoading = useChatData();
+  useNotifications();
 
   if (isLoading) {
     return (

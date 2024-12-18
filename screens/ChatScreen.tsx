@@ -128,8 +128,9 @@ const ChatScreen: React.FC<ChatListScreenProps> = ({ navigation, route }) => {
       if (id && userData?.userId) {
         await sendTextMessage(
           id,
-          userData.userId,
+          userData,
           messageText,
+          chatUsers,
           replyingTo && replyingTo.key,
         );
       }
@@ -181,8 +182,9 @@ const ChatScreen: React.FC<ChatListScreenProps> = ({ navigation, route }) => {
         if (id && userData?.userId) {
           await sendImage(
             id,
-            userData.userId,
+            userData,
             uploadUrl,
+            chatUsers,
             replyingTo && replyingTo.key,
           );
           setReplyingTo(undefined);

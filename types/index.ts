@@ -62,6 +62,7 @@ export interface UserData {
   signUpDate: string;
   about?: string;
   profilePicture?: string;
+  pushTokens?: { [key: string]: string };
 }
 
 export interface Users {

@@ -10,6 +10,7 @@ import {
 } from "firebase/database";
 import { getFirebaseApp } from "../firebaseHelper";
 import { Message, ChatData, UserData } from "../../types";
+import { getUserPushTokens } from "./authActions";
 import { getUserChats, deleteUserChat, addUserChat } from "./userActions";
 
 export const createChat = async (
@@ -39,20 +40,52 @@ export const createChat = async (
 
 export const sendTextMessage = async (
   chatId: string,
-  senderId: string,
+  senderData: UserData,
   messageText: string,
+  chatUsers: string[],
   replyTo?: string,
 ): Promise<void> => {
-  await sendMessage(chatId, senderId, messageText, null, replyTo, undefined);
+  await sendMessage(
+    chatId,
+    senderData.userId,
+    messageText,
+    null,
+    replyTo,
+    undefined,
+  );
+
+  const otherUsers = chatUsers.filter((uid) => uid !== senderData.userId);
+  sendPushNotificationForUsers(
+    otherUsers,
+    `${senderData.firstName} ${senderData.lastName}`,
+    messageText,
+    chatId,
+  );
 };
 
 export const sendImage = async (
   chatId: string,
-  senderId: string,
+  senderData: UserData,
   imageUrl: string,
+  chatUsers: string[],
   replyTo?: string,
 ): Promise<void> => {
-  await sendMessage(chatId, senderId, "Image", imageUrl, replyTo, undefined);
+  await sendMessage(
+    chatId,
+    senderData.userId,
+    "Image",
+    imageUrl,
+    replyTo,
+    undefined,
+  );
+
+  const otherUsers = chatUsers.filter((uid) => uid !== senderData.userId);
+  sendPushNotificationForUsers(
+    otherUsers,
+    `${senderData.firstName} ${senderData.lastName}`,
+    `${senderData.firstName} sent an image`,
+    chatId,
+  );
 };
 
 export const sendInfoMessage = async (
@@ -153,7 +186,7 @@ export const removeUserFromChat = async (
   userLoggedInData: UserData,
   userToRemoveData: UserData,
   chatData: ChatData,
-) => {
+): Promise<void> => {
   const userToRemoveId = userToRemoveData.userId;
   const newUsers = chatData.users.filter((uid) => uid !== userToRemoveId);
   await updateChatData(String(chatData.key), userLoggedInData.userId, {
@@ -187,7 +220,7 @@ export const addUsersToChat = async (
   userLoggedInData: UserData,
   usersToAddData: UserData[],
   chatData: ChatData,
-) => {
+): Promise<void> => {
   const existingUsers = Object.values(chatData.users);
   const newUsers: string[] = [];
   const chatDataKey = String(chatData.key);
@@ -218,4 +251,32 @@ export const addUsersToChat = async (
     newUsers.length > 1 ? `and ${newUsers.length - 1} others ` : "";
   const messageText = `${userLoggedInData.firstName} ${userLoggedInData.lastName} added ${userAddedName} ${moreUsersMessage}to the chat`;
   await sendInfoMessage(chatDataKey, userLoggedInData.userId, messageText);
+};
+
+const sendPushNotificationForUsers = (
+  chatUsers: string[],
+  title: string,
+  body: string,
+  chatId: string,
+): void => {
+  chatUsers.forEach(async (uid) => {
+    const tokens = await getUserPushTokens(uid);
+
+    for (const key in tokens) {
+      const token = tokens[key];
+
+      await fetch("https://exp.host/--/api/v2/push/send", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          to: token,
+          title,
+          body,
+          data: { chatId },
+        }),
+      });
+    }
+  });
 };

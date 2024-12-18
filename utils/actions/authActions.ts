@@ -4,13 +4,15 @@ import {
   User as FirebaseUser,
 } from "firebase/auth";
 import { FirebaseError } from "firebase/app";
-import { child, getDatabase, ref, set, update } from "firebase/database";
+import { child, get, getDatabase, ref, set, update } from "firebase/database";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Dispatch, UnknownAction } from "@reduxjs/toolkit";
+import * as Device from "expo-device";
+import * as Notifications from "expo-notifications";
 
 import { authenticate, logout } from "../../store/authSlice";
 import { getUserData } from "./userActions";
-import { getFirebaseApp, getAuth } from "../firebaseHelper";
+import { getAuth, getFirebaseApp } from "../firebaseHelper";
 import { UserData } from "../../types";
 
 let timer: NodeJS.Timeout;
@@ -56,9 +58,10 @@ export const signUp = (
 
       dispatch(authenticate({ token: accessToken, userData }));
       await saveDataToStorage(accessToken, uid, expiryDate);
+      await storePushToken(userData);
 
       timer = setTimeout(() => {
-        dispatch(userLogout() as unknown as UnknownAction);
+        dispatch(userLogout(userData) as unknown as UnknownAction);
       }, millisecondsUntilExpiry);
     } catch (error) {
       console.log(error);
@@ -102,9 +105,10 @@ export const signIn = (
 
       dispatch(authenticate({ token: accessToken, userData }));
       await saveDataToStorage(accessToken, uid, expiryDate);
+      await storePushToken(userData);
 
       timer = setTimeout(() => {
-        dispatch(userLogout() as unknown as UnknownAction);
+        dispatch(userLogout(userData) as unknown as UnknownAction);
       }, millisecondsUntilExpiry);
     } catch (error) {
       const errorCode = (error as FirebaseError).code;
@@ -123,8 +127,16 @@ export const signIn = (
   };
 };
 
-export const userLogout = (): ((dispatch: Dispatch) => Promise<void>) => {
+export const userLogout = (
+  userData: UserData,
+): ((dispatch: Dispatch) => Promise<void>) => {
   return async (dispatch: Dispatch) => {
+    try {
+      await removePushToken(userData);
+    } catch (error) {
+      console.log(error);
+    }
+
     await AsyncStorage.clear();
     clearTimeout(timer);
     dispatch(logout());
@@ -180,4 +192,70 @@ const saveDataToStorage = async (
       expiryDate: expiryDate.toISOString(),
     }),
   );
+};
+
+const storePushToken = async (userData: UserData): Promise<void> => {
+  if (!Device.isDevice) {
+    return;
+  }
+
+  const token = (await Notifications.getExpoPushTokenAsync()).data;
+
+  const tokenData = { ...userData.pushTokens };
+  const tokenArray = Object.values(tokenData);
+  if (tokenArray.includes(token)) {
+    return;
+  }
+
+  tokenArray.push(token);
+
+  for (let i = 0; i < tokenArray.length; i++) {
+    tokenData[i] = tokenArray[i];
+  }
+
+  const app = getFirebaseApp();
+  const dbRef = ref(getDatabase(app));
+  const userRef = child(dbRef, `users/${userData.userId}/pushTokens`);
+  await set(userRef, tokenData);
+};
+
+const removePushToken = async (userData: UserData): Promise<void> => {
+  if (!Device.isDevice) {
+    return;
+  }
+
+  const token = (await Notifications.getExpoPushTokenAsync()).data;
+  const tokenData = await getUserPushTokens(userData.userId);
+
+  for (const key in tokenData) {
+    if (tokenData[key] === token) {
+      delete tokenData[key];
+      break;
+    }
+  }
+
+  const app = getFirebaseApp();
+  const dbRef = ref(getDatabase(app));
+  const userRef = child(dbRef, `users/${userData.userId}/pushTokens`);
+  await set(userRef, tokenData);
+};
+
+export const getUserPushTokens = async (
+  userId: string,
+): Promise<{ [key: string]: string } | undefined> => {
+  try {
+    const app = getFirebaseApp();
+    const dbRef = ref(getDatabase(app));
+    const userRef = child(dbRef, `users/${userId}/pushTokens`);
+
+    const snapshot = await get(userRef);
+
+    if (!snapshot || !snapshot.exists()) {
+      return {};
+    }
+
+    return snapshot.val() || {};
+  } catch (error) {
+    console.log(error);
+  }
 };
